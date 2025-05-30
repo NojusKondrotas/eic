@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "brainfuck.h"
-#include "io.h"
+#include "../runtime/io.h"
 
 
 typedef enum{

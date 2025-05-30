@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "eic.h"
-#include "src/interpreters/brainfuck.h"
+#include "interpreters/brainfuck.h"
 
 int main(int argc, char *argv[]){
     if(argc != 2){
