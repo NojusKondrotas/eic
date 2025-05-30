@@ -29,3 +29,24 @@ int main(int argc, char *argv[]){
 
     return EXIT_SUCCESS;
 }
+
+char *get_extension(char *str){
+    char *extension = str;
+    while(*str != '\0'){
+        if(*str != '.')
+            extension = ++str;
+        else return ++extension;
+    }
+
+    return extension;
+}
+
+unsigned long hash_string(char *str){
+    unsigned long hash = 5381;
+    int c;
+
+    while((c = *str++))
+        hash = ((hash << 5) + hash) + c;
+    
+    return hash;
+}
