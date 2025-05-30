@@ -24,7 +24,7 @@ int execute_bf_file(FILE *fptr){
     }
 
     size_t pc = 0;
-    int memc = 0;
+    unsigned int memc = 0;
     int c;
 
     while((c = fgetc(fptr)) != EOF){
@@ -33,6 +33,8 @@ int execute_bf_file(FILE *fptr){
                 memc = (memc + 1) % TAPE_LENGTH;
                 break;
             case OP_DEC_PC:
+                --memc;
+                //handle wrapping back to (TAPE_LENGTH - 1) if 0xFFFFFFFF is reached
                 memc = memc / UTIL_MAX_TAPE_WRAPPING * (TAPE_LENGTH - 1) + (1 - memc / UTIL_MAX_TAPE_WRAPPING) * memc;
                 break;
             case OP_INC_VAL:
