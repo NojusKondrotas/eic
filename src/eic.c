@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
 char *get_extension(char *str){
     char *extension = str;
     while(*str != '\0'){
-        if(*str != '.')
+        if(*str != '.' || *(str + 1) == '\\' || *(str + 1) == '.')
             extension = ++str;
         else return ++extension;
     }
