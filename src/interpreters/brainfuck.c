@@ -23,11 +23,24 @@ int execute_bf_file(FILE *fptr){
         return EXIT_FAILURE;
     }
 
+    size_t loop_depth = 0, loop_stack_cap = 10;
+    int invalid_loop = 0, invalid_loop_start_depth = 0;;
+    size_t *loop_stack = (size_t *)calloc(loop_stack_cap, sizeof(size_t));
+    if(!loop_stack){
+        fprintf(stderr, "Failure allocating memory\n");
+        return EXIT_FAILURE;
+    }
+
     size_t pc = 0;
     unsigned int memc = 0;
     int c;
 
     while((c = fgetc(fptr)) != EOF){
+        if(c != OP_JMP_FWD && c != OP_JMP_BCK && invalid_loop){
+            ++pc;
+            continue;
+        }
+
         switch(c){
             case OP_INC_PC:
                 memc = (memc + 1) % TAPE_LENGTH;
@@ -50,10 +63,28 @@ int execute_bf_file(FILE *fptr){
                 putchar(memory_tape[memc]);
                 break;
             case OP_JMP_FWD:
-                //implement
+                loop_stack[loop_depth++] = pc;
+
+                if(memory_tape[memc] == 0){
+                    invalid_loop = 1;
+                    invalid_loop_start_depth = loop_depth;
+                }
+
                 break;
             case OP_JMP_BCK:
-                //implement
+                if(loop_depth == 0){
+                    return EXIT_FAILURE;
+                }
+
+                if(loop_depth == invalid_loop_start_depth){
+                    invalid_loop = invalid_loop_start_depth = 0;
+                }
+                
+                if(memory_tape[memc] != 0){
+                    pc = loop_stack[--loop_depth] - 1;
+                    fseek(fptr, pc + 1, SEEK_SET);
+                }
+
                 break;
         }
 
@@ -61,6 +92,7 @@ int execute_bf_file(FILE *fptr){
     }
 
     free(memory_tape);
+    free(loop_stack);
 
     return EXIT_SUCCESS;
 }
