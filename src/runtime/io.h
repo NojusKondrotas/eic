@@ -1,1 +1,1 @@
-int read_in_bf();
+unsigned int read_in_bf();
