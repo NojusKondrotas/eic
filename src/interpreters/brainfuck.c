@@ -41,6 +41,12 @@ int execute_bf_file(FILE *fptr){
             continue;
         }
 
+        if(loop_depth == loop_stack_cap){
+            loop_stack_cap *= 2;
+            size_t *new_data = (size_t *)realloc(loop_stack, loop_stack_cap * sizeof(size_t));
+            loop_stack = new_data;
+        }
+
         switch(c){
             case OP_INC_PC:
                 memc = (memc + 1) % TAPE_LENGTH;
