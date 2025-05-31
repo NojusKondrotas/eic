@@ -21,6 +21,7 @@ int main(int argc, char *argv[]){
     {
     case BF:
         case B:
+            execute_bf(argv[1]);
             break;
     default:
         fprintf(stderr, "Unsupported file extension: %s\n", extension);
@@ -33,7 +34,7 @@ int main(int argc, char *argv[]){
 char *get_extension(char *str){
     char *extension = str;
     while(*str != '\0'){
-        if(*str != '.' || *(str + 1) == '\\' || *(str + 1) == '.')
+        if(*str != '.' || *(str + 1) == '\\' || *(str + 1) == '.' || *(str + 1) == '/')
             extension = ++str;
         else return ++extension;
     }
