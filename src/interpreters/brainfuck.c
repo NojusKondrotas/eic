@@ -103,11 +103,11 @@ int execute_bf_file(FILE *fptr){
     return EXIT_SUCCESS;
 }
 
-int execute_bf(char *str){
+int execute_bf(char *file_name){
     FILE *fptr;
 
-    if((fptr = fopen(str, "r")) == NULL){
-        fprintf(stderr, "Failure opening input file: %s\n", str);
+    if((fptr = fopen(file_name, "r")) == NULL){
+        fprintf(stderr, "Failure opening input file: %s\n", file_name);
         return EXIT_FAILURE;
     }
 
