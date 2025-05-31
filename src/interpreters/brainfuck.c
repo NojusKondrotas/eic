@@ -57,7 +57,7 @@ int execute_bf_file(FILE *fptr){
                 memc = memc / UTIL_MAX_TAPE_WRAPPING * (TAPE_LENGTH - 1) + (1 - memc / UTIL_MAX_TAPE_WRAPPING) * memc;
                 break;
             case OP_INC_VAL:
-                --memory_tape[memc];
+                ++memory_tape[memc];
                 break;
             case OP_DEC_VAL:
                 --memory_tape[memc];
