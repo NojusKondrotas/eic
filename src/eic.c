@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "eic.h"
 #include "interpreters/brainfuck.h"
+#include "interpreters/whitespace.h"
 
 int main(int argc, char *argv[]){
     if(argc != 2){
@@ -22,6 +23,8 @@ int main(int argc, char *argv[]){
     case BF:
         case B:
             return execute_bf(argv[1]);
+    case WS:
+        return execute_whitespace(argv[1]);
     default:
         fprintf(stderr, "Unsupported file extension: %s\n", extension);
         return EXIT_FAILURE;
