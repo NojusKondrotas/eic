@@ -16,13 +16,12 @@ int main(int argc, char *argv[]){
     }
 
     unsigned long hash_result = hash_string(extension);
-
+    
     switch (hash_result)
     {
     case BF:
         case B:
-            execute_bf(argv[1]);
-            break;
+            return execute_bf(argv[1]);
     default:
         fprintf(stderr, "Unsupported file extension: %s\n", extension);
         return EXIT_FAILURE;
