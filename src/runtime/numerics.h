@@ -1,0 +1,1 @@
+ssize_t parse_whitespace_number(FILE *);

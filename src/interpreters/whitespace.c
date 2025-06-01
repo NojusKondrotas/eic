@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include "whitespace.h"
+#include "../runtime/numerics.h"
 
 typedef struct{
     size_t Spaces, Tabs, instruction_index;
@@ -9,8 +11,8 @@ typedef struct{
 int execute_whitespace_file(FILE* fptr){
     int c1, c2;
 
-    size_t stack_cap = 20, heap_cap = 10, labels_cap = 5;
-    size_t *stack = calloc(stack_cap, sizeof(size_t));
+    size_t stack_cap = 20, stack_top_idx = 0, heap_cap = 10, labels_cap = 5;
+    ssize_t *stack = calloc(stack_cap, sizeof(ssize_t));
     if(!stack){
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
@@ -32,7 +34,7 @@ int execute_whitespace_file(FILE* fptr){
                 //handle_flow_control(fptr, stack, labels);
                 break;
             case SPACE:
-                //handle_stack_manip(stack);
+                handle_stack_manip(fptr, &stack, &stack_cap, &stack_top_idx);
                 break;
             case TAB:
                 c2 = fgetc(fptr);
@@ -52,6 +54,10 @@ int execute_whitespace_file(FILE* fptr){
                 }
         }
     }
+
+    free(stack);
+    free(heap);
+    free(labels);
 
     return EXIT_SUCCESS;
 }
@@ -75,8 +81,18 @@ void handle_flow_control(FILE *fptr, size_t *stack, Label *labels){
 
 }
 
-void handle_stack_manip(size_t *stack){
+int handle_stack_manip(FILE *fptr, ssize_t **stack, size_t *stack_cap, size_t *stack_top_idx){
+    int c = fgetc(fptr);
 
+    switch(c){
+        case SPACE:
+            ssize_t number = parse_whitespace_number(fptr);
+            int status = push_to_stack(stack, number, stack_cap, stack_top_idx);
+            if(status == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
+            break;
+    }
 }
 
 void handle_io(size_t *stack, size_t *heap){
@@ -85,4 +101,20 @@ void handle_io(size_t *stack, size_t *heap){
 
 void handle_arithmetic(size_t *stack){
 
+}
+
+int push_to_stack(ssize_t **stack, ssize_t number, size_t *stack_cap, size_t *stack_top_idx){
+    if(*stack_cap == *stack_top_idx){
+        *stack_cap *= 2;
+        *stack = realloc(*stack, *stack_cap * sizeof(ssize_t));
+        if(!(*stack)){
+            fprintf(stderr, "Failure allocating memory\n");
+            return EXIT_FAILURE;
+        }
+    }
+    
+    (*stack)[*stack_top_idx] = number;
+    ++(*stack_top_idx);
+
+    return EXIT_SUCCESS;
 }
