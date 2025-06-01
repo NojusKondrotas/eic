@@ -17,7 +17,7 @@ int execute_whitespace_file(FILE* fptr){
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
     }
-    size_t *heap = calloc(heap_cap, sizeof(size_t));
+    ssize_t *heap = calloc(heap_cap, sizeof(ssize_t));
     if(!heap){
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
@@ -77,7 +77,7 @@ int execute_whitespace(char *file_name){
     return status;
 }
 
-void handle_flow_control(FILE *fptr, size_t *stack, Label *labels){
+void handle_flow_control(FILE *fptr, ssize_t *stack, Label *labels){
 
 }
 
@@ -95,11 +95,11 @@ int handle_stack_manip(FILE *fptr, ssize_t **stack, size_t *stack_cap, size_t *s
     }
 }
 
-void handle_io(size_t *stack, size_t *heap){
+void handle_io(ssize_t *stack, ssize_t *heap){
 
 }
 
-void handle_arithmetic(size_t *stack){
+void handle_arithmetic(ssize_t *stack){
 
 }
 
