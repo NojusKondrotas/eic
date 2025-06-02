@@ -163,6 +163,7 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
                     fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: %c %c (ASCII: %d %d)\n", c1, c2_lf, c1, c2_lf);
                     return EXIT_FAILURE;
             }
+            break;
         case TAB:
             int c2_tab = fgetc(fptr);
             if(c2_tab == EOF){
@@ -183,8 +184,57 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
                     fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: %c %c (ASCII: %d %d)\n", c1, c2_tab, c1, c2_tab);
                     return EXIT_FAILURE;
             }
+            break;
         default:
             fprintf(stderr, "Unrecognised character while tokenizing whitespace Stack Manipulation command: %c (ASCII: %d)\n", c1, c1);
+            return EXIT_FAILURE;
+    }
+}
+
+int tokenize_flow_control(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
+    int c1 = fgetc(fptr), c2 = fgetc(fptr);
+    if(c1 == EOF || c2 == EOF){
+        fprintf(stderr, "Encountered unexpected EOF\n");
+        return EXIT_FAILURE;
+    }
+
+    if(*tokens_cap == (*tokens_count)){
+        if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+    }
+    
+    int key = (c1 << 8) | c2;
+    switch(key){
+        case (SPACE << 8) | SPACE:
+            (*tokens)[(*tokens_count)++] = FC_SS_l;
+            return EXIT_SUCCESS;
+        
+        case (SPACE << 8) | TAB:
+            (*tokens)[(*tokens_count)++] = FC_ST_l;
+            return EXIT_SUCCESS;
+
+        case (SPACE << 8) | LF:
+            (*tokens)[(*tokens_count)++] = FC_Sl_l;
+            return EXIT_SUCCESS;
+
+        case (TAB << 8) | SPACE:
+            (*tokens)[(*tokens_count)++] = FC_TS_l;
+            return EXIT_SUCCESS;
+
+        case (TAB << 8) | TAB:
+            (*tokens)[(*tokens_count)++] = FC_TT_l;
+            return EXIT_SUCCESS;
+
+        case (TAB << 8) | LF:
+            (*tokens)[(*tokens_count)++] = FC_TL;
+            return EXIT_SUCCESS;
+
+        case (LF << 8) | LF:
+            (*tokens)[(*tokens_count)++] = FC_LL;
+            return EXIT_SUCCESS;
+        
+        default:
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Flow Control command: %c %c (ASCII: %d %d)\n", c1, c2, c1, c2);
             return EXIT_FAILURE;
     }
 }
@@ -233,13 +283,26 @@ int *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
                         free(tokens);
                         return NULL;
                 }
+                break;
+
             case SPACE:
                 if(tokenize_stack_manip(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
                     free(tokens);
                     return NULL;
                 }
-
                 break;
+
+            case LF:
+                if(tokenize_flow_control(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
+                    free(tokens);
+                    return NULL;
+                }
+                break;
+
+            default:
+                fprintf(stderr, "Unrecognised character while tokenizing whitespace IMP: %c (ASCII: %d)\n", imp_c1, imp_c1);
+                free(tokens);
+                return NULL;
         }
     }
 
