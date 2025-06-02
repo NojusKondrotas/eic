@@ -3,21 +3,7 @@
 #include "whitespace.h"
 #include "lexer.h"
 #include "../../runtime/io.h"
-
-int ensure_cap(int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    if(*tokens_cap == *tokens_count){
-        (*tokens_cap) *= 2;
-        int *tmp = realloc(*tokens, *tokens_cap * sizeof(int));
-        if(!tmp){
-            fprintf(stderr, "Failure allocating memory\n");
-            return EXIT_FAILURE;
-        }
-
-        *tokens = tmp;
-    }
-
-    return EXIT_SUCCESS;
-}
+#include "../../runtime/stack.h"
 
 int tokenize_io(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1, c2;
@@ -28,26 +14,29 @@ int tokenize_io(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_cou
     
     int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
 
-    if(*tokens_cap == *tokens_count){
-        if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
-            return EXIT_FAILURE;
-    }
-
     switch(key){
         case (TAB << 8) | TAB:
-            (*tokens)[(*tokens_count)++] = IO_TT;
+            if(int_push_token(tokens, tokens_cap, tokens_count, IO_TT) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case( SPACE << 8) | SPACE:
-            (*tokens)[(*tokens_count)++] = IO_SS;
+            if(int_push_token(tokens, tokens_cap, tokens_count, IO_SS) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (TAB << 8) | SPACE:
-            (*tokens)[(*tokens_count)++] = IO_TS;
+            if(int_push_token(tokens, tokens_cap, tokens_count, IO_TS) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (SPACE << 8) | TAB:
-            (*tokens)[(*tokens_count)++] = IO_ST;
+            if(int_push_token(tokens, tokens_cap, tokens_count, IO_ST) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         default:
@@ -65,30 +54,35 @@ int tokenize_arithmetic(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *to
 
     int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
 
-    if(*tokens_cap == (*tokens_count)){
-        if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
-            return EXIT_FAILURE;
-    }
-
     switch(key){
         case (SPACE << 8) | SPACE:
-            (*tokens)[(*tokens_count)++] = AR_SS;
+            if(int_push_token(tokens, tokens_cap, tokens_count, AR_SS) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (SPACE << 8) | LF:
-            (*tokens)[(*tokens_count)++] = AR_SL;
+            if(int_push_token(tokens, tokens_cap, tokens_count, AR_SL) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (TAB << 8) | TAB:
-            (*tokens)[(*tokens_count)++] = AR_TT;
+            if(int_push_token(tokens, tokens_cap, tokens_count, AR_TT) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (TAB<< 8) | SPACE:
-            (*tokens)[(*tokens_count)++] = AR_TS;
+            if(int_push_token(tokens, tokens_cap, tokens_count, AR_TS) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (SPACE << 8) | TAB:
-            (*tokens)[(*tokens_count)++] = AR_ST;
+            if(int_push_token(tokens, tokens_cap, tokens_count, AR_ST) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         default:
@@ -102,18 +96,17 @@ int tokenize_heap(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_c
     if(read_ws_command_char(fptr, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    if(*tokens_cap == (*tokens_count)){
-        if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
-            return EXIT_FAILURE;
-    }
-
     switch((unsigned char)c){
         case SPACE:
-            (*tokens)[(*tokens_count)++] = HP_S;
+            if(int_push_token(tokens, tokens_cap, tokens_count, HP_S) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case TAB:
-            (*tokens)[(*tokens_count)++] = HP_T;
+            if(int_push_token(tokens, tokens_cap, tokens_count, HP_T) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         default:
@@ -127,14 +120,11 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    if(*tokens_cap == (*tokens_count)){
-        if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
-            return EXIT_FAILURE;
-    }
-
     switch((unsigned char)c1){
         case SPACE:
-            (*tokens)[(*tokens_count)++] = SM_S_n;
+            if(int_push_token(tokens, tokens_cap, tokens_count, SM_S_n) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case LF:
@@ -145,15 +135,21 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
             int key_lf = ((unsigned char)c1 << 8) | (unsigned char)c2_lf;
             switch(key_lf){
                 case (LF << 8) | SPACE:
-                    (*tokens)[(*tokens_count)++] = SM_LS;
+                    if(int_push_token(tokens, tokens_cap, tokens_count, SM_LS) == EXIT_FAILURE)
+                        return EXIT_FAILURE;
+
                     return EXIT_SUCCESS;
 
                 case (LF << 8) | TAB:
-                    (*tokens)[(*tokens_count)++] = SM_LT;
+                    if(int_push_token(tokens, tokens_cap, tokens_count, SM_LT) == EXIT_FAILURE)
+                        return EXIT_FAILURE;
+
                     return EXIT_SUCCESS;
 
                 case (LF << 8) | LF:
-                    (*tokens)[(*tokens_count)++] = SM_LL;
+                    if(int_push_token(tokens, tokens_cap, tokens_count, SM_LL) == EXIT_FAILURE)
+                        return EXIT_FAILURE;
+
                     return EXIT_SUCCESS;
 
                 default:
@@ -169,11 +165,15 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
             int key_tab = ((unsigned char)c1 << 8) | (unsigned char)c2_tab;
             switch(key_tab){
                 case (TAB << 8) | SPACE:
-                    (*tokens)[(*tokens_count)++] = SM_TS_n;
+                    if(int_push_token(tokens, tokens_cap, tokens_count, SM_TS_n) == EXIT_FAILURE)
+                        return EXIT_FAILURE;
+
                     return EXIT_SUCCESS;
 
                 case (TAB << 8) | LF:
-                    (*tokens)[(*tokens_count)++] = SM_TL_n;
+                    if(int_push_token(tokens, tokens_cap, tokens_count, SM_TL_n) == EXIT_FAILURE)
+                        return EXIT_FAILURE;
+
                     return EXIT_SUCCESS;
 
                 default:
@@ -193,40 +193,49 @@ int tokenize_flow_control(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
-
-    if(*tokens_cap == (*tokens_count)){
-        if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
-            return EXIT_FAILURE;
-    }
     
     int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
     switch(key){
         case (SPACE << 8) | SPACE:
-            (*tokens)[(*tokens_count)++] = FC_SS_l;
+            if(int_push_token(tokens, tokens_cap, tokens_count, FC_SS_l) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
         
         case (SPACE << 8) | TAB:
-            (*tokens)[(*tokens_count)++] = FC_ST_l;
+            if(int_push_token(tokens, tokens_cap, tokens_count, FC_ST_l) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (SPACE << 8) | LF:
-            (*tokens)[(*tokens_count)++] = FC_Sl_l;
+            if(int_push_token(tokens, tokens_cap, tokens_count, FC_Sl_l) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (TAB << 8) | SPACE:
-            (*tokens)[(*tokens_count)++] = FC_TS_l;
+            if(int_push_token(tokens, tokens_cap, tokens_count, FC_TS_l) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (TAB << 8) | TAB:
-            (*tokens)[(*tokens_count)++] = FC_TT_l;
+            if(int_push_token(tokens, tokens_cap, tokens_count, FC_TT_l) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (TAB << 8) | LF:
-            (*tokens)[(*tokens_count)++] = FC_TL;
+            if(int_push_token(tokens, tokens_cap, tokens_count, FC_TL) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
 
         case (LF << 8) | LF:
-            (*tokens)[(*tokens_count)++] = FC_LL;
+            if(int_push_token(tokens, tokens_cap, tokens_count, FC_LL) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+
             return EXIT_SUCCESS;
         
         default:
