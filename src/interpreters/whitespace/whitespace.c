@@ -181,7 +181,7 @@ int execute_whitespace_file(FILE* fptr){
     }
 
     size_t c;
-    for(int i = 0; i < token_count; ++i){
+    for(size_t i = 0; i < token_count; ++i){
         size_t c = tokens[i];
         printf("%zX\n", c);
 

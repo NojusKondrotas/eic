@@ -30,7 +30,7 @@ int size_t_ensure_cap(size_t **tokens, size_t *tokens_cap, size_t *tokens_count)
 
 int ptrdiff_t_push_token(ptrdiff_t **tokens, size_t *tokens_cap, size_t *tokens_count, size_t token){
     if(*tokens_cap == *tokens_count){
-        if(ssize_t_ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
+        if(ptrdiff_t_ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
             return EXIT_FAILURE;
     }
     (*tokens)[(*tokens_count)++] = token;

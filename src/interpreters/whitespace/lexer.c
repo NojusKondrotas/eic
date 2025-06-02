@@ -40,7 +40,7 @@ int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_
             return EXIT_SUCCESS;
 
         default:
-            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: %c %c (ASCII: %d %d)\n", c1, c2, c1, c2);
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: (ASCII: %zu %zu)\n", c1, c2);
             return EXIT_FAILURE;
     }
 }
@@ -86,7 +86,7 @@ int tokenize_arithmetic(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t 
             return EXIT_SUCCESS;
 
         default:
-            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: %c %c (ASCII: %d %d)\n", c1, c2, c1, c2);
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: (ASCII: %zu %zu)\n", c1, c2);
             return EXIT_FAILURE;
     }
 }
@@ -110,7 +110,7 @@ int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *token
             return EXIT_SUCCESS;
 
         default:
-            fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: %c (ASCII: %d)\n", c, c);
+            fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: (ASCII: %zu)\n", c);
             return EXIT_FAILURE;
     }
 }
@@ -153,7 +153,7 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
                     return EXIT_SUCCESS;
 
                 default:
-                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: %c %c (ASCII: %d %d)\n", c1, c2_lf, c1, c2_lf);
+                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2_lf);
                     return EXIT_FAILURE;
             }
 
@@ -177,12 +177,12 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
                     return EXIT_SUCCESS;
 
                 default:
-                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: %c %c (ASCII: %d %d)\n", c1, c2_tab, c1, c2_tab);
+                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2_tab);
                     return EXIT_FAILURE;
             }
 
         default:
-            fprintf(stderr, "Unrecognised character while tokenizing whitespace Stack Manipulation command: %c (ASCII: %d)\n", c1, c1);
+            fprintf(stderr, "Unrecognised character while tokenizing whitespace Stack Manipulation command: (ASCII: %zu)\n", c1);
             return EXIT_FAILURE;
     }
 }
@@ -239,7 +239,7 @@ int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_
             return EXIT_SUCCESS;
         
         default:
-            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Flow Control command: %c %c (ASCII: %d %d)\n", c1, c2, c1, c2);
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Flow Control command: (ASCII: %zu %zu)\n", c1, c2);
             return EXIT_FAILURE;
     }
 }
@@ -289,7 +289,7 @@ size_t *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
                         break;
 
                     default:
-                        fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IMP: %c %c (ASCII: %d %d)\n", imp_c1, imp_c2, imp_c1, imp_c2);
+                        fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IMP: (ASCII: %zu %zu)\n", imp_c1, imp_c2);
                         free(tokens);
                         return NULL;
                 }
