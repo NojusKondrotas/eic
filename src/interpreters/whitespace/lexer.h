@@ -35,6 +35,8 @@
 #define HP_T 0x41
 
 
+#define WS_KEY(a, b) (((unsigned char)(a) << 8) | (unsigned char)(b))
+
 int *tokenize_whitespace(FILE *, size_t *);
 
 #endif

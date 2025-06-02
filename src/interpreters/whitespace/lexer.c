@@ -12,7 +12,7 @@ int tokenize_io(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_cou
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
     
-    int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
+    int key = WS_KEY(c1, c2);
 
     switch(key){
         case (TAB << 8) | TAB:
@@ -52,7 +52,7 @@ int tokenize_arithmetic(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *to
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
+    int key = WS_KEY(c1, c2);
 
     switch(key){
         case (SPACE << 8) | SPACE:
@@ -132,7 +132,7 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
             if(read_ws_command_char(fptr, &c2_lf) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            int key_lf = ((unsigned char)c1 << 8) | (unsigned char)c2_lf;
+            int key_lf = WS_KEY(c1, c2_lf);
             switch(key_lf){
                 case (LF << 8) | SPACE:
                     if(int_push_token(tokens, tokens_cap, tokens_count, SM_LS) == EXIT_FAILURE)
@@ -162,7 +162,7 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
             if(read_ws_command_char(fptr, &c2_tab) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            int key_tab = ((unsigned char)c1 << 8) | (unsigned char)c2_tab;
+            int key_tab = WS_KEY(c1, c2_tab);
             switch(key_tab){
                 case (TAB << 8) | SPACE:
                     if(int_push_token(tokens, tokens_cap, tokens_count, SM_TS_n) == EXIT_FAILURE)
@@ -194,7 +194,7 @@ int tokenize_flow_control(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
     
-    int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
+    int key = WS_KEY(c1, c2);
     switch(key){
         case (SPACE << 8) | SPACE:
             if(int_push_token(tokens, tokens_cap, tokens_count, FC_SS_l) == EXIT_FAILURE)
@@ -247,6 +247,10 @@ int tokenize_flow_control(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *
 int *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
     size_t tokens_cap = TOKENS_CAP, tokens_count = 0;
     int *tokens = calloc(tokens_cap, sizeof(int));
+    if(!tokens){
+        fprintf(stderr, "Failure allocating memory\n");
+        return NULL;
+    }
     
     int imp_c1, imp_c2;
 
@@ -258,7 +262,7 @@ int *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
                     return NULL;
                 }
 
-                int key = ((unsigned char)imp_c1 << 8) | (unsigned char)imp_c2;
+                int key = WS_KEY(imp_c1, imp_c2);
                 switch(key){
                     case (TAB << 8) | LF:
                         if(tokenize_io(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
