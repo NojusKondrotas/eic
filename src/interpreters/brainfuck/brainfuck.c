@@ -23,18 +23,17 @@ int execute_bf_file(FILE *fptr){
         return EXIT_FAILURE;
     }
 
-    size_t loop_depth = 0, loop_stack_cap = 10;
-    int invalid_loop = 0, invalid_loop_start_depth = 0;;
+    size_t loop_depth = 0, loop_stack_cap = 10, invalid_loop_start_depth = 0;
+    int invalid_loop = 0;
     size_t *loop_stack = (size_t *)calloc(loop_stack_cap, sizeof(size_t));
     if(!loop_stack){
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
     }
 
-    size_t pc = 0;
-    unsigned int memc = 0;
-    int c;
-
+    size_t pc = 0, memc = 0;
+    
+    size_t c;
     while((c = fgetc(fptr)) != EOF){
         if(c != OP_JMP_FWD && c != OP_JMP_BCK && invalid_loop){
             ++pc;

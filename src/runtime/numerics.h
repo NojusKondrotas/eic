@@ -1,6 +1,9 @@
 #ifndef NUMERICS_H
 #define NUMERICS_H
 
-ssize_t parse_whitespace_number(FILE *);
+#include <stdio.h>
+#include <stddef.h>
+
+ptrdiff_t parse_whitespace_number(FILE *);
 
 #endif

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "whitespace.h"
 #include "../../runtime/numerics.h"
 #include "../../runtime/stack.h"
@@ -163,12 +164,12 @@ int execute_whitespace_file(FILE* fptr){
         return EXIT_FAILURE;
 
     size_t stack_cap = STACK_CAP, stack_top = 0, heap_cap = HEAP_CAP, labels_cap = LABELS_CAP;
-    ssize_t *stack = calloc(stack_cap, sizeof(ssize_t));
+    ptrdiff_t *stack = calloc(stack_cap, sizeof(ptrdiff_t));
     if(!stack){
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
     }
-    ssize_t *heap = calloc(heap_cap, sizeof(ssize_t));
+    ptrdiff_t *heap = calloc(heap_cap, sizeof(ptrdiff_t));
     if(!heap){
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;

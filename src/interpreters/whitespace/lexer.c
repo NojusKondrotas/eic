@@ -6,13 +6,13 @@
 #include "../../runtime/stack.h"
 
 int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1, c2;
+    size_t c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
     
-    int key = WS_KEY(c1, c2);
+    size_t key = WS_KEY(c1, c2);
 
     switch(key){
         case (TAB << 8) | TAB:
@@ -46,13 +46,13 @@ int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_
 }
 
 int tokenize_arithmetic(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1, c2;
+    size_t c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    int key = WS_KEY(c1, c2);
+    size_t key = WS_KEY(c1, c2);
 
     switch(key){
         case (SPACE << 8) | SPACE:
@@ -92,7 +92,7 @@ int tokenize_arithmetic(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t 
 }
 
 int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c;
+    size_t c;
     if(read_ws_command_char(fptr, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
@@ -116,7 +116,7 @@ int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *token
 }
 
 int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1;
+    size_t c1;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
@@ -128,11 +128,11 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
             return EXIT_SUCCESS;
 
         case LF:
-            int c2_lf;
+            size_t c2_lf;
             if(read_ws_command_char(fptr, &c2_lf) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            int key_lf = WS_KEY(c1, c2_lf);
+            size_t key_lf = WS_KEY(c1, c2_lf);
             switch(key_lf){
                 case (LF << 8) | SPACE:
                     if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_LS) == EXIT_FAILURE)
@@ -158,11 +158,11 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
             }
 
         case TAB:
-            int c2_tab;
+        size_t c2_tab;
             if(read_ws_command_char(fptr, &c2_tab) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            int key_tab = WS_KEY(c1, c2_tab);
+            size_t key_tab = WS_KEY(c1, c2_tab);
             switch(key_tab){
                 case (TAB << 8) | SPACE:
                     if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_TS_n) == EXIT_FAILURE)
@@ -188,13 +188,13 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
 }
 
 int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1, c2;
+    size_t c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
     
-    int key = WS_KEY(c1, c2);
+    size_t key = WS_KEY(c1, c2);
     switch(key){
         case (SPACE << 8) | SPACE:
             if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_SS_l) == EXIT_FAILURE)
@@ -252,17 +252,17 @@ size_t *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
         return NULL;
     }
     
-    int imp_c1, imp_c2;
+    size_t imp_c1, imp_c2;
 
     while((imp_c1 = fgetc(fptr)) != EOF){
-        switch((unsigned char)imp_c1){
+        switch(imp_c1){
             case TAB:
                 if(read_ws_command_char(fptr, &imp_c2) == EXIT_FAILURE){
                     free(tokens);
                     return NULL;
                 }
 
-                int key = WS_KEY(imp_c1, imp_c2);
+                size_t key = WS_KEY(imp_c1, imp_c2);
                 switch(key){
                     case (TAB << 8) | LF:
                         if(tokenize_io(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){

@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "../interpreters/whitespace/whitespace.h"
-#include <sys/types.h>
 
-ssize_t parse_whitespace_number(FILE *fptr){
+ptrdiff_t parse_whitespace_number(FILE *fptr){
     int sign;
-    ssize_t number = 0;
+    ptrdiff_t number = 0;
 
-    int c = fgetc(fptr);
+    size_t c = fgetc(fptr);
 
     switch(c){
         case SPACE:

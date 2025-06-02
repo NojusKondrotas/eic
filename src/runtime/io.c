@@ -20,7 +20,7 @@ unsigned int read_in_bf(){
     return num_val;
 }
 
-int read_ws_command_char(FILE *fptr, int *out_char){
+int read_ws_command_char(FILE *fptr, size_t *out_char){
     do {
         *out_char = fgetc(fptr);
         if (*out_char == EOF) {
