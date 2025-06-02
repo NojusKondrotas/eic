@@ -3,14 +3,17 @@
 #include "whitespace.h"
 #include "lexer.h"
 
-int ensure_cap(char *(*tokens), size_t *tokens_cap, size_t *tokens_count){
+int ensure_cap(char **tokens, size_t *tokens_cap, size_t *tokens_count){
     if(*tokens_cap == *tokens_count){
         (*tokens_cap) *= 2;
-        (*tokens) = realloc(*tokens, *tokens_cap * sizeof(char));
-        if(!*tokens){
+        char *tmp = realloc(*tokens, *tokens_cap * sizeof(char));
+        if(!tmp){
             fprintf(stderr, "Failure allocating memory\n");
+            free(*tokens);
             return EXIT_FAILURE;
         }
+
+        *tokens = tmp;
     }
 
     return EXIT_SUCCESS;
