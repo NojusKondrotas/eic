@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "whitespace.h"
 #include "lexer.h"
+#include "../../runtime/io.h"
 
 int ensure_cap(int **tokens, size_t *tokens_cap, size_t *tokens_count){
     if(*tokens_cap == *tokens_count){
@@ -19,23 +20,11 @@ int ensure_cap(int **tokens, size_t *tokens_cap, size_t *tokens_count){
 }
 
 int tokenize_io(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1;
-    do {
-        c1 = fgetc(fptr);
-        if (c1 == EOF) {
-            fprintf(stderr, "Encountered unexpected EOF\n");
-            return EXIT_FAILURE;
-        }
-    } while(c1 != SPACE && c1 != TAB && c1 != LF);
-
-    int c2;
-    do {
-        c2 = fgetc(fptr);
-        if (c2 == EOF) {
-            fprintf(stderr, "Encountered unexpected EOF\n");
-            return EXIT_FAILURE;
-        }
-    } while(c2 != SPACE && c2 != TAB && c2 != LF);
+    int c1, c2;
+    if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+    if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
+        return EXIT_FAILURE;
     
     int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
 
@@ -68,23 +57,11 @@ int tokenize_io(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_cou
 }
 
 int tokenize_arithmetic(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1;
-    do {
-        c1 = fgetc(fptr);
-        if (c1 == EOF) {
-            fprintf(stderr, "Encountered unexpected EOF\n");
-            return EXIT_FAILURE;
-        }
-    } while(c1 != SPACE && c1 != TAB && c1 != LF);
-
-    int c2;
-    do {
-        c2 = fgetc(fptr);
-        if (c2 == EOF) {
-            fprintf(stderr, "Encountered unexpected EOF\n");
-            return EXIT_FAILURE;
-        }
-    } while(c2 != SPACE && c2 != TAB && c2 != LF);
+    int c1, c2;
+    if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+    if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
+        return EXIT_FAILURE;
 
     int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
 
@@ -122,13 +99,8 @@ int tokenize_arithmetic(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *to
 
 int tokenize_heap(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c;
-    do {
-        c = fgetc(fptr);
-        if (c == EOF) {
-            fprintf(stderr, "Encountered unexpected EOF\n");
-            return EXIT_FAILURE;
-        }
-    } while(c != SPACE && c != TAB && c != LF);
+    if(read_ws_command_char(fptr, &c) == EXIT_FAILURE)
+        return EXIT_FAILURE;
 
     if(*tokens_cap == (*tokens_count)){
         if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
@@ -152,13 +124,8 @@ int tokenize_heap(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_c
 
 int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1;
-    do {
-        c1 = fgetc(fptr);
-        if (c1 == EOF) {
-            fprintf(stderr, "Encountered unexpected EOF\n");
-            return EXIT_FAILURE;
-        }
-    } while(c1 != SPACE && c1 != TAB && c1 != LF);
+    if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+        return EXIT_FAILURE;
 
     if(*tokens_cap == (*tokens_count)){
         if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
@@ -172,13 +139,8 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
 
         case LF:
             int c2_lf;
-            do {
-                c2_lf = fgetc(fptr);
-                if (c2_lf == EOF) {
-                    fprintf(stderr, "Encountered unexpected EOF\n");
-                    return EXIT_FAILURE;
-                }
-            } while(c2_lf != SPACE && c2_lf != TAB && c2_lf != LF);
+            if(read_ws_command_char(fptr, &c2_lf) == EXIT_FAILURE)
+                return EXIT_FAILURE;
 
             int key_lf = ((unsigned char)c1 << 8) | (unsigned char)c2_lf;
             switch(key_lf){
@@ -201,13 +163,8 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
 
         case TAB:
             int c2_tab;
-            do {
-                c2_tab = fgetc(fptr);
-                if (c2_tab == EOF) {
-                    fprintf(stderr, "Encountered unexpected EOF\n");
-                    return EXIT_FAILURE;
-                }
-            } while(c2_tab != SPACE && c2_tab != TAB && c2_tab != LF);
+            if(read_ws_command_char(fptr, &c2_tab) == EXIT_FAILURE)
+                return EXIT_FAILURE;
 
             int key_tab = ((unsigned char)c1 << 8) | (unsigned char)c2_tab;
             switch(key_tab){
@@ -231,23 +188,11 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
 }
 
 int tokenize_flow_control(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1;
-    do {
-        c1 = fgetc(fptr);
-        if (c1 == EOF) {
-            fprintf(stderr, "Encountered unexpected EOF\n");
-            return EXIT_FAILURE;
-        }
-    } while(c1 != SPACE && c1 != TAB && c1 != LF);
-
-    int c2;
-    do {
-        c2 = fgetc(fptr);
-        if (c2 == EOF) {
-            fprintf(stderr, "Encountered unexpected EOF\n");
-            return EXIT_FAILURE;
-        }
-    } while(c2 != SPACE && c2 != TAB && c2 != LF);
+    int c1, c2;
+    if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+    if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
+        return EXIT_FAILURE;
 
     if(*tokens_cap == (*tokens_count)){
         if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
@@ -299,14 +244,10 @@ int *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
     while((imp_c1 = fgetc(fptr)) != EOF){
         switch((unsigned char)imp_c1){
             case TAB:
-                do {
-                    imp_c2 = fgetc(fptr);
-                    if (imp_c2 == EOF) {
-                        fprintf(stderr, "Encountered unexpected EOF\n");
-                        free(tokens);
-                        return NULL;
-                    }
-                } while(imp_c2 != SPACE && imp_c2 != TAB && imp_c2 != LF);
+                if(read_ws_command_char(fptr, &imp_c2) == EXIT_FAILURE){
+                    free(tokens);
+                    return NULL;
+                }
 
                 int key = ((unsigned char)imp_c1 << 8) | (unsigned char)imp_c2;
                 switch(key){

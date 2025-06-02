@@ -3,4 +3,6 @@
 
 unsigned int read_in_bf();
 
+int read_ws_command_char(FILE *, int *);
+
 #endif

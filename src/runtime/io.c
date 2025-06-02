@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "io.h"
+#include "../interpreters/whitespace/whitespace.h"
 
 unsigned int read_in_bf(){
     char in_data[3] = {0};
@@ -17,4 +18,16 @@ unsigned int read_in_bf(){
     }
 
     return num_val;
+}
+
+int read_ws_command_char(FILE *fptr, int *out_char){
+    do {
+        *out_char = fgetc(fptr);
+        if (*out_char == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(*out_char != SPACE && *out_char != TAB && *out_char != LF);
+
+    return EXIT_SUCCESS;
 }
