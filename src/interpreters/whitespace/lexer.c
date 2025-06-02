@@ -19,11 +19,24 @@ int ensure_cap(int **tokens, size_t *tokens_cap, size_t *tokens_count){
 }
 
 int tokenize_io(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1 = fgetc(fptr), c2 = fgetc(fptr);
-    if(c1 == EOF || c2 == EOF){
-        fprintf(stderr, "Encountered unexpected EOF\n");
-        return EXIT_FAILURE;
-    }
+    int c1;
+    do {
+        c1 = fgetc(fptr);
+        if (c1 == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(c1 != SPACE && c1 != TAB && c1 != LF);
+
+    int c2;
+    do {
+        c2 = fgetc(fptr);
+        if (c2 == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(c2 != SPACE && c2 != TAB && c2 != LF);
+    
     int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
 
     if(*tokens_cap == *tokens_count){
@@ -55,11 +68,24 @@ int tokenize_io(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_cou
 }
 
 int tokenize_arithmetic(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1 = fgetc(fptr), c2 = fgetc(fptr);
-    if(c1 == EOF || c2 == EOF){
-        fprintf(stderr, "Encountered unexpected EOF\n");
-        return EXIT_FAILURE;
-    }
+    int c1;
+    do {
+        c1 = fgetc(fptr);
+        if (c1 == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(c1 != SPACE && c1 != TAB && c1 != LF);
+
+    int c2;
+    do {
+        c2 = fgetc(fptr);
+        if (c2 == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(c2 != SPACE && c2 != TAB && c2 != LF);
+
     int key = ((unsigned char)c1 << 8) | (unsigned char)c2;
 
     if(*tokens_cap == (*tokens_count)){
@@ -95,11 +121,14 @@ int tokenize_arithmetic(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *to
 }
 
 int tokenize_heap(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c = fgetc(fptr);
-    if(c == EOF){
-        fprintf(stderr, "Encountered unexpected EOF\n");
-        return EXIT_FAILURE;
-    }
+    int c;
+    do {
+        c = fgetc(fptr);
+        if (c == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(c != SPACE && c != TAB && c != LF);
 
     if(*tokens_cap == (*tokens_count)){
         if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
@@ -122,11 +151,14 @@ int tokenize_heap(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_c
 }
 
 int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1 = fgetc(fptr);
-    if(c1 == EOF){
-        fprintf(stderr, "Encountered unexpected EOF\n");
-        return EXIT_FAILURE;
-    }
+    int c1;
+    do {
+        c1 = fgetc(fptr);
+        if (c1 == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(c1 != SPACE && c1 != TAB && c1 != LF);
 
     if(*tokens_cap == (*tokens_count)){
         if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
@@ -139,11 +171,15 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
             return EXIT_SUCCESS;
 
         case LF:
-            int c2_lf = fgetc(fptr);
-            if(c2_lf == EOF){
-                fprintf(stderr, "Encountered unexpected EOF\n");
-                return EXIT_FAILURE;
-            }
+            int c2_lf;
+            do {
+                c2_lf = fgetc(fptr);
+                if (c2_lf == EOF) {
+                    fprintf(stderr, "Encountered unexpected EOF\n");
+                    return EXIT_FAILURE;
+                }
+            } while(c2_lf != SPACE && c2_lf != TAB && c2_lf != LF);
+
             int key_lf = ((unsigned char)c1 << 8) | (unsigned char)c2_lf;
             switch(key_lf){
                 case (LF << 8) | SPACE:
@@ -164,11 +200,15 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
             }
 
         case TAB:
-            int c2_tab = fgetc(fptr);
-            if(c2_tab == EOF){
-                fprintf(stderr, "Encountered unexpected EOF\n");
-                return EXIT_FAILURE;
-            }
+            int c2_tab;
+            do {
+                c2_tab = fgetc(fptr);
+                if (c2_tab == EOF) {
+                    fprintf(stderr, "Encountered unexpected EOF\n");
+                    return EXIT_FAILURE;
+                }
+            } while(c2_tab != SPACE && c2_tab != TAB && c2_tab != LF);
+
             int key_tab = ((unsigned char)c1 << 8) | (unsigned char)c2_tab;
             switch(key_tab){
                 case (TAB << 8) | SPACE:
@@ -191,11 +231,23 @@ int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *t
 }
 
 int tokenize_flow_control(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
-    int c1 = fgetc(fptr), c2 = fgetc(fptr);
-    if(c1 == EOF || c2 == EOF){
-        fprintf(stderr, "Encountered unexpected EOF\n");
-        return EXIT_FAILURE;
-    }
+    int c1;
+    do {
+        c1 = fgetc(fptr);
+        if (c1 == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(c1 != SPACE && c1 != TAB && c1 != LF);
+
+    int c2;
+    do {
+        c2 = fgetc(fptr);
+        if (c2 == EOF) {
+            fprintf(stderr, "Encountered unexpected EOF\n");
+            return EXIT_FAILURE;
+        }
+    } while(c2 != SPACE && c2 != TAB && c2 != LF);
 
     if(*tokens_cap == (*tokens_count)){
         if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
@@ -247,11 +299,14 @@ int *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
     while((imp_c1 = fgetc(fptr)) != EOF){
         switch((unsigned char)imp_c1){
             case TAB:
-                imp_c2 = fgetc(fptr);
-                if(imp_c2 == EOF){
-                    fprintf(stderr, "Encountered unexpected EOF\n");
-                    return NULL;
-                }
+                do {
+                    imp_c2 = fgetc(fptr);
+                    if (imp_c2 == EOF) {
+                        fprintf(stderr, "Encountered unexpected EOF\n");
+                        free(tokens);
+                        return NULL;
+                    }
+                } while(imp_c2 != SPACE && imp_c2 != TAB && imp_c2 != LF);
 
                 int key = ((unsigned char)imp_c1 << 8) | (unsigned char)imp_c2;
                 switch(key){
@@ -299,11 +354,6 @@ int *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
                     return NULL;
                 }
                 break;
-
-            default:
-                fprintf(stderr, "Unrecognised character while tokenizing whitespace IMP: %c (ASCII: %d)\n", imp_c1, imp_c1);
-                free(tokens);
-                return NULL;
         }
     }
 
