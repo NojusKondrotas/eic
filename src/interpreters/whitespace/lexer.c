@@ -20,6 +20,10 @@ int ensure_cap(char **tokens, size_t *tokens_cap, size_t *tokens_count){
 
 int tokenize_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr), c2 = fgetc(fptr);
+    if(c1 == EOF || c2 == EOF){
+        fprintf(stderr, "Encountered unexpected EOF\n");
+        return EXIT_FAILURE;
+    }
     int key = (c1 << 8) | c2;
 
     if(*tokens_cap == *tokens_count){
@@ -45,7 +49,7 @@ int tokenize_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_co
             return EXIT_SUCCESS;
 
         default:
-            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: %c %c (ASCII: %d %d)", c1, c2, c1, c2);
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: %c %c (ASCII: %d %d)\n", c1, c2, c1, c2);
             return EXIT_FAILURE;
     }
 
@@ -54,6 +58,10 @@ int tokenize_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_co
 
 int tokenize_arithmetic(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr), c2 = fgetc(fptr);
+    if(c1 == EOF || c2 == EOF){
+        fprintf(stderr, "Encountered unexpected EOF\n");
+        return EXIT_FAILURE;
+    }
     int key = (c1 << 8) | c2;
 
     if(*tokens_cap == (*tokens_count)){
@@ -83,13 +91,17 @@ int tokenize_arithmetic(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *t
             return EXIT_SUCCESS;
 
         default:
-            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: %c %c (ASCII: %d %d)", c1, c2, c1, c2);
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: %c %c (ASCII: %d %d)\n", c1, c2, c1, c2);
             return EXIT_FAILURE;
     }
 }
 
 int tokenize_heap(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c = fgetc(fptr);
+    if(c == EOF){
+        fprintf(stderr, "Encountered unexpected EOF\n");
+        return EXIT_FAILURE;
+    }
 
     if(*tokens_cap == (*tokens_count)){
         if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
@@ -104,7 +116,7 @@ int tokenize_heap(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_
             (*tokens)[(*tokens_count)++] = HP_T;
             return EXIT_SUCCESS;
         default:
-            fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: %c (ASCII: %d)", c, c);
+            fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: %c (ASCII: %d)\n", c, c);
             return EXIT_FAILURE;
     }
 
@@ -113,6 +125,10 @@ int tokenize_heap(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_
 
 int tokenize_stack_manip(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr);
+    if(c1 == EOF){
+        fprintf(stderr, "Encountered unexpected EOF\n");
+        return EXIT_FAILURE;
+    }
 
     if(*tokens_cap == (*tokens_count)){
         if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
@@ -125,6 +141,10 @@ int tokenize_stack_manip(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *
             return EXIT_SUCCESS;
         case LF:
             int c2_lf = fgetc(fptr);
+            if(c2_lf == EOF){
+                fprintf(stderr, "Encountered unexpected EOF\n");
+                return EXIT_FAILURE;
+            }
             int key = (c1 << 8) | c2_lf;
             switch(key){
                 case (LF << 8) | SPACE:
@@ -140,11 +160,15 @@ int tokenize_stack_manip(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *
                     return EXIT_SUCCESS;
 
                 default:
-                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: %c %c (ASCII: %d %d)", c1, c2_lf, c1, c2_lf);
+                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: %c %c (ASCII: %d %d)\n", c1, c2_lf, c1, c2_lf);
                     return EXIT_FAILURE;
             }
         case TAB:
             int c2_tab = fgetc(fptr);
+            if(c2_tab == EOF){
+                fprintf(stderr, "Encountered unexpected EOF\n");
+                return EXIT_FAILURE;
+            }
             int key = (c1 << 8) | c2_tab;
             switch(key){
                 case (TAB << 8) | SPACE:
@@ -156,11 +180,11 @@ int tokenize_stack_manip(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *
                     return EXIT_SUCCESS;
 
                 default:
-                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: %c %c (ASCII: %d %d)", c1, c2_tab, c1, c2_tab);
+                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: %c %c (ASCII: %d %d)\n", c1, c2_tab, c1, c2_tab);
                     return EXIT_FAILURE;
             }
         default:
-            fprintf(stderr, "Unrecognised character while tokenizing whitespace Stack Manipulation command: %c (ASCII: %d)", c1, c1);
+            fprintf(stderr, "Unrecognised character while tokenizing whitespace Stack Manipulation command: %c (ASCII: %d)\n", c1, c1);
             return EXIT_FAILURE;
     }
 }
@@ -183,6 +207,7 @@ char *tokenize_whitespace(FILE *fptr){
                         }
 
                         break;
+
                     case SPACE:
                         if(tokenize_arithmetic(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
                             free(tokens);
@@ -190,6 +215,7 @@ char *tokenize_whitespace(FILE *fptr){
                         }
 
                         break;
+
                     case TAB:
                         if(tokenize_heap(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
                             free(tokens);
@@ -197,8 +223,13 @@ char *tokenize_whitespace(FILE *fptr){
                         }
 
                         break;
+
+                    case EOF:
+                        fprintf(stderr, "Encountered unexpected EOF\n");
+                        return NULL;
+
                     default:
-                        fprintf(stderr, "Unrecognised character while tokenizing whitespace IMP: %c (ASCII: %d)", imp_c2, imp_c2);
+                        fprintf(stderr, "Unrecognised character while tokenizing whitespace IMP: %c (ASCII: %d)\n", imp_c2, imp_c2);
                         free(tokens);
                         return NULL;
                 }
