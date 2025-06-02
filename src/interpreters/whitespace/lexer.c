@@ -9,7 +9,6 @@ int ensure_cap(char **tokens, size_t *tokens_cap, size_t *tokens_count){
         char *tmp = realloc(*tokens, *tokens_cap * sizeof(char));
         if(!tmp){
             fprintf(stderr, "Failure allocating memory\n");
-            free(*tokens);
             return EXIT_FAILURE;
         }
 
@@ -178,27 +177,38 @@ char *tokenize_whitespace(FILE *fptr){
                 imp_c2 = fgetc(fptr);
                 switch(imp_c2){
                     case LF:
-                        if(tokenize_io(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                        if(tokenize_io(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
+                            free(tokens);
                             return NULL;
+                        }
 
                         break;
                     case SPACE:
-                        if(tokenize_arithmetic(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                        if(tokenize_arithmetic(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
+                            free(tokens);
                             return NULL;
+                        }
 
                         break;
                     case TAB:
-                        if(tokenize_heap(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                        if(tokenize_heap(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
+                            free(tokens);
                             return NULL;
+                        }
 
                         break;
                     default:
                         fprintf(stderr, "Unrecognised character while tokenizing whitespace IMP: %c (ASCII: %d)", imp_c2, imp_c2);
+                        free(tokens);
+                        return NULL;
                 }
             case SPACE:
                 if(tokenize_stack_manip(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
+                    free(tokens);
                     return NULL;
                 }
+
+                break;
         }
     }
 
