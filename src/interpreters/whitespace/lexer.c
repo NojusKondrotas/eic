@@ -96,7 +96,7 @@ int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *token
     if(read_ws_command_char(fptr, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    switch((unsigned char)c){
+    switch(c){
         case SPACE:
             if(size_t_push_token(tokens, tokens_cap, tokens_count, HP_S) == EXIT_FAILURE)
                 return EXIT_FAILURE;
@@ -116,24 +116,43 @@ int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *token
 }
 
 int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    size_t c1;
+    size_t c1, c2, key;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    switch((unsigned char)c1){
+    switch(c1){
         case SPACE:
             if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_S_n) == EXIT_FAILURE)
                 return EXIT_FAILURE;
+            
+            while (1) {
+                if (read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                
+                if (c1 == LF)
+                    break;
+            
+                switch (c1) {
+                    case SPACE:
+                        if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+
+                    case TAB:
+                        if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                }
+            }
 
             return EXIT_SUCCESS;
 
         case LF:
-            size_t c2_lf;
-            if(read_ws_command_char(fptr, &c2_lf) == EXIT_FAILURE)
+            if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            size_t key_lf = WS_KEY(c1, c2_lf);
-            switch(key_lf){
+            key = WS_KEY(c1, c2);
+            switch(key){
                 case (LF << 8) | SPACE:
                     if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_LS) == EXIT_FAILURE)
                         return EXIT_FAILURE;
@@ -153,20 +172,39 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
                     return EXIT_SUCCESS;
 
                 default:
-                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2_lf);
+                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2);
                     return EXIT_FAILURE;
             }
 
         case TAB:
-        size_t c2_tab;
-            if(read_ws_command_char(fptr, &c2_tab) == EXIT_FAILURE)
+            if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            size_t key_tab = WS_KEY(c1, c2_tab);
-            switch(key_tab){
+            key = WS_KEY(c1, c2);
+            switch(key){
                 case (TAB << 8) | SPACE:
                     if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_TS_n) == EXIT_FAILURE)
                         return EXIT_FAILURE;
+
+                    while (1) {
+                        if (read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        
+                        if (c1 == LF)
+                            break;
+                    
+                        switch (c1) {
+                            case SPACE:
+                                if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                                    return EXIT_FAILURE;
+                                break;
+                                
+                            case TAB:
+                                if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                                    return EXIT_FAILURE;
+                                break;
+                        }
+                    }
 
                     return EXIT_SUCCESS;
 
@@ -174,10 +212,30 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
                     if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_TL_n) == EXIT_FAILURE)
                         return EXIT_FAILURE;
 
+                    while (1) {
+                        if (read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        
+                        if (c1 == LF)
+                            break;
+                    
+                        switch (c1) {
+                            case SPACE:
+                                if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                                    return EXIT_FAILURE;
+                                break;
+                                
+                            case TAB:
+                                if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                                    return EXIT_FAILURE;
+                                break;
+                        }
+                    }
+
                     return EXIT_SUCCESS;
 
                 default:
-                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2_tab);
+                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2);
                     return EXIT_FAILURE;
             }
 
@@ -200,11 +258,51 @@ int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_
             if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_SS_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
+            while (1) {
+                if (read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                
+                if (c1 == LF)
+                    break;
+            
+                switch (c1) {
+                    case SPACE:
+                        if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                        
+                    case TAB:
+                        if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                }
+            }
+
             return EXIT_SUCCESS;
         
         case (SPACE << 8) | TAB:
             if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_ST_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
+
+            while (1) {
+                if (read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                
+                if (c1 == LF)
+                    break;
+            
+                switch (c1) {
+                    case SPACE:
+                        if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                        
+                    case TAB:
+                        if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                }
+            }
 
             return EXIT_SUCCESS;
 
@@ -212,17 +310,77 @@ int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_
             if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_Sl_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
+            while (1) {
+                if (read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                
+                if (c1 == LF)
+                    break;
+            
+                switch (c1) {
+                    case SPACE:
+                        if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                        
+                    case TAB:
+                        if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                }
+            }
+
             return EXIT_SUCCESS;
 
         case (TAB << 8) | SPACE:
             if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_TS_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
+            while (1) {
+                if (read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                
+                if (c1 == LF)
+                    break;
+            
+                switch (c1) {
+                    case SPACE:
+                        if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                        
+                    case TAB:
+                        if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                }
+            }
+
             return EXIT_SUCCESS;
 
         case (TAB << 8) | TAB:
             if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_TT_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
+
+            while (1) {
+                if (read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                
+                if (c1 == LF)
+                    break;
+            
+                switch (c1) {
+                    case SPACE:
+                        if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                        
+                    case TAB:
+                        if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                            return EXIT_FAILURE;
+                        break;
+                }
+            }
 
             return EXIT_SUCCESS;
 

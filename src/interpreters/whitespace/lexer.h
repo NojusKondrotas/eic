@@ -34,6 +34,9 @@
 #define HP_S 0x40 //Store
 #define HP_T 0x41 //Retrieve
 
+#define SPACE_RAW 0x50
+#define TAB_RAW 0x51
+
 
 #define WS_KEY(a, b) (((unsigned char)(a) << 8) | (unsigned char)(b))
 
