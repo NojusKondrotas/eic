@@ -35,6 +35,6 @@
 #define HP_T 0x41
 
 
-char *tokenize_whitespace(FILE *);
+int *tokenize_whitespace(FILE *, size_t *);
 
 #endif

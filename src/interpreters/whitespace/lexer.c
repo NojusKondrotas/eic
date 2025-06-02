@@ -3,10 +3,10 @@
 #include "whitespace.h"
 #include "lexer.h"
 
-int ensure_cap(char **tokens, size_t *tokens_cap, size_t *tokens_count){
+int ensure_cap(int **tokens, size_t *tokens_cap, size_t *tokens_count){
     if(*tokens_cap == *tokens_count){
         (*tokens_cap) *= 2;
-        char *tmp = realloc(*tokens, *tokens_cap * sizeof(char));
+        int *tmp = realloc(*tokens, *tokens_cap * sizeof(int));
         if(!tmp){
             fprintf(stderr, "Failure allocating memory\n");
             return EXIT_FAILURE;
@@ -18,7 +18,7 @@ int ensure_cap(char **tokens, size_t *tokens_cap, size_t *tokens_count){
     return EXIT_SUCCESS;
 }
 
-int tokenize_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_io(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr), c2 = fgetc(fptr);
     if(c1 == EOF || c2 == EOF){
         fprintf(stderr, "Encountered unexpected EOF\n");
@@ -56,7 +56,7 @@ int tokenize_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_co
     return EXIT_SUCCESS;
 }
 
-int tokenize_arithmetic(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_arithmetic(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr), c2 = fgetc(fptr);
     if(c1 == EOF || c2 == EOF){
         fprintf(stderr, "Encountered unexpected EOF\n");
@@ -96,7 +96,7 @@ int tokenize_arithmetic(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *t
     }
 }
 
-int tokenize_heap(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_heap(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c = fgetc(fptr);
     if(c == EOF){
         fprintf(stderr, "Encountered unexpected EOF\n");
@@ -123,7 +123,7 @@ int tokenize_heap(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_
     return EXIT_SUCCESS;
 }
 
-int tokenize_stack_manip(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_stack_manip(FILE *fptr, int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr);
     if(c1 == EOF){
         fprintf(stderr, "Encountered unexpected EOF\n");
@@ -189,9 +189,9 @@ int tokenize_stack_manip(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *
     }
 }
 
-char *tokenize_whitespace(FILE *fptr){
+int *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
     size_t tokens_cap = TOKENS_CAP, tokens_count = 0;
-    char *tokens = calloc(tokens_cap, sizeof(char));
+    int *tokens = calloc(tokens_cap, sizeof(int));
     
     int imp_c1, imp_c2;
 
@@ -243,5 +243,6 @@ char *tokenize_whitespace(FILE *fptr){
         }
     }
 
+    *out_tokens_count = tokens_count;
     return tokens;
 }
