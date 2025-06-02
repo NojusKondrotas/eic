@@ -3,11 +3,11 @@
 #include "whitespace.h"
 #include "lexer.h"
 
-int ensure_cap(char **tokens, size_t *tokens_cap, size_t *tokens_count){
+int ensure_cap(char *(*tokens), size_t *tokens_cap, size_t *tokens_count){
     if(*tokens_cap == *tokens_count){
         (*tokens_cap) *= 2;
-        *tokens = realloc(*tokens, *tokens_cap);
-        if(!tokens){
+        (*tokens) = realloc(*tokens, *tokens_cap * sizeof(char));
+        if(!*tokens){
             fprintf(stderr, "Failure allocating memory\n");
             return EXIT_FAILURE;
         }
@@ -18,39 +18,30 @@ int ensure_cap(char **tokens, size_t *tokens_cap, size_t *tokens_count){
 
 int tokenize_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr), c2 = fgetc(fptr);
+    int key = (c1 << 8) | c2;
 
-    switch(c1 & c2){
-        case TAB & TAB:
-            if(*tokens_cap == *tokens_count){
-                if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                    return EXIT_FAILURE;
-            }
-            *tokens[*tokens_count++] = IO_TT;
+    if(*tokens_cap == *tokens_count){
+        if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+    }
+
+    switch(key){
+        case (TAB << 8) | TAB:
+            (*tokens)[(*tokens_count)++] = IO_TT;
             return EXIT_SUCCESS;
-        case SPACE & SPACE:
-            if(*tokens_cap == *tokens_count){
-                if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                    return EXIT_FAILURE;
-            }
-            *tokens[*tokens_count++] = IO_SS;
+
+        case( SPACE << 8) | SPACE:
+            (*tokens)[(*tokens_count)++] = IO_SS;
             return EXIT_SUCCESS;
-        case TAB & SPACE:
-            if(c1 == TAB){
-                if(*tokens_cap == *tokens_count){
-                    if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                        return EXIT_FAILURE;
-                }
-                *tokens[*tokens_count++] = IO_TS;
-                return EXIT_SUCCESS;
-            }
-            else{
-                if(*tokens_cap == *tokens_count){
-                    if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                        return EXIT_FAILURE;
-                }
-                *tokens[*tokens_count++] = IO_ST;
-                return EXIT_SUCCESS;
-            }
+
+        case (TAB << 8) | SPACE:
+            (*tokens)[(*tokens_count)++] = IO_TS;
+            return EXIT_SUCCESS;
+
+        case (SPACE << 8) | TAB:
+            (*tokens)[(*tokens_count)++] = IO_ST;
+            return EXIT_SUCCESS;
+
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: %c %c (ASCII: %d %d)", c1, c2, c1, c2);
             return EXIT_FAILURE;
@@ -61,46 +52,34 @@ int tokenize_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_co
 
 int tokenize_arithmetic(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr), c2 = fgetc(fptr);
+    int key = (c1 << 8) | c2;
 
-    switch(c1 & c2){
-        case SPACE & SPACE:
-            if(*tokens_cap == *tokens_count){
-                if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                    return EXIT_FAILURE;
-            }
-            *tokens[*tokens_count++] = AR_SS;
+    if(*tokens_cap == (*tokens_count)){
+        if(ensure_cap(tokens, tokens_cap, tokens_count) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+    }
+
+    switch(key){
+        case (SPACE << 8) | SPACE:
+            (*tokens)[(*tokens_count)++] = AR_SS;
             return EXIT_SUCCESS;
-        case SPACE & LF:
-            if(*tokens_cap == *tokens_count){
-                if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                    return EXIT_FAILURE;
-            }
-            *tokens[*tokens_count++] = AR_SL;
+
+        case (SPACE << 8) | LF:
+            (*tokens)[(*tokens_count)++] = AR_SL;
             return EXIT_SUCCESS;
-        case TAB & TAB:
-            if(*tokens_cap == *tokens_count){
-                if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                    return EXIT_FAILURE;
-            }
-            *tokens[*tokens_count++] = AR_TT;
+
+        case (TAB << 8) | TAB:
+            (*tokens)[(*tokens_count)++] = AR_TT;
             return EXIT_SUCCESS;
-        case TAB & SPACE:
-            if(c1 == TAB){
-                if(*tokens_cap == *tokens_count){
-                    if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                        return EXIT_FAILURE;
-                }
-                *tokens[*tokens_count++] = AR_TS;
-                return EXIT_SUCCESS;
-            }
-            else{
-                if(*tokens_cap == *tokens_count){
-                    if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
-                        return EXIT_FAILURE;
-                }
-                *tokens[*tokens_count++] = AR_ST;
-                return EXIT_SUCCESS;
-            }
+
+        case (TAB<< 8) | SPACE:
+            (*tokens)[(*tokens_count)++] = AR_TS;
+            return EXIT_SUCCESS;
+
+        case (SPACE << 8) | TAB:
+            (*tokens)[(*tokens_count)++] = AR_ST;
+            return EXIT_SUCCESS;
+
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: %c %c (ASCII: %d %d)", c1, c2, c1, c2);
             return EXIT_FAILURE;
@@ -109,7 +88,7 @@ int tokenize_arithmetic(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *t
 
 char *tokenize_whitespace(FILE *fptr){
     size_t tokens_cap = TOKENS_CAP, tokens_count = 0;
-    char *tokens = calloc(tokens_cap, sizeof(char *));
+    char *tokens = calloc(tokens_cap, sizeof(char));
     
     int imp_c1, imp_c2;
 
@@ -119,7 +98,7 @@ char *tokenize_whitespace(FILE *fptr){
                 imp_c2 = fgetc(fptr);
                 switch(imp_c2){
                     case LF:
-                        if(tokenize_io(fptr, tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                        if(tokenize_io(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
                             return NULL;
 
                         break;
