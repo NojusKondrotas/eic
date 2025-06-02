@@ -37,6 +37,6 @@
 
 #define WS_KEY(a, b) (((unsigned char)(a) << 8) | (unsigned char)(b))
 
-int *tokenize_whitespace(FILE *, size_t *);
+size_t *tokenize_whitespace(FILE *, size_t *);
 
 #endif
