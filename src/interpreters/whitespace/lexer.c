@@ -16,7 +16,7 @@ int ensure_cap(char **tokens, size_t *tokens_cap, size_t *tokens_count){
     return EXIT_SUCCESS;
 }
 
-int handle_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1 = fgetc(fptr), c2 = fgetc(fptr);
 
     switch(c1 & c2){
@@ -59,6 +59,54 @@ int handle_io(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_coun
     return EXIT_SUCCESS;
 }
 
+int tokenize_arithmetic(FILE *fptr, char **tokens, size_t *tokens_cap, size_t *tokens_count){
+    int c1 = fgetc(fptr), c2 = fgetc(fptr);
+
+    switch(c1 & c2){
+        case SPACE & SPACE:
+            if(*tokens_cap == *tokens_count){
+                if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+            }
+            *tokens[*tokens_count++] = AR_SS;
+            return EXIT_SUCCESS;
+        case SPACE & LF:
+            if(*tokens_cap == *tokens_count){
+                if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+            }
+            *tokens[*tokens_count++] = AR_SL;
+            return EXIT_SUCCESS;
+        case TAB & TAB:
+            if(*tokens_cap == *tokens_count){
+                if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+            }
+            *tokens[*tokens_count++] = AR_TT;
+            return EXIT_SUCCESS;
+        case TAB & SPACE:
+            if(c1 == TAB){
+                if(*tokens_cap == *tokens_count){
+                    if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                        return EXIT_FAILURE;
+                }
+                *tokens[*tokens_count++] = AR_TS;
+                return EXIT_SUCCESS;
+            }
+            else{
+                if(*tokens_cap == *tokens_count){
+                    if(ensure_cap(&tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                        return EXIT_FAILURE;
+                }
+                *tokens[*tokens_count++] = AR_ST;
+                return EXIT_SUCCESS;
+            }
+        default:
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: %c %c (ASCII: %d %d)", c1, c2, c1, c2);
+            return EXIT_FAILURE;
+    }
+}
+
 char *tokenize_whitespace(FILE *fptr){
     size_t tokens_cap = TOKENS_CAP, tokens_count = 0;
     char *tokens = calloc(tokens_cap, sizeof(char *));
@@ -71,7 +119,7 @@ char *tokenize_whitespace(FILE *fptr){
                 imp_c2 = fgetc(fptr);
                 switch(imp_c2){
                     case LF:
-                        if(handle_io(fptr, tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
+                        if(tokenize_io(fptr, tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE)
                             return NULL;
 
                         break;

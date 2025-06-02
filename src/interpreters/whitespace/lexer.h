@@ -17,11 +17,11 @@
 #define SM_TS_n 0x14
 #define SM_TL_n 0x15
 
-#define A_SS 0x20
-#define A_ST 0x21
-#define A_SL 0x22
-#define A_TS 0x23
-#define A_TT 0x24
+#define AR_SS 0x20
+#define AR_ST 0x21
+#define AR_SL 0x22
+#define AR_TS 0x23
+#define AR_TT 0x24
 
 #define FC_SS_l 0x30
 #define FC_ST_l 0x31
