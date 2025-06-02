@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../interpreters/whitespace.h"
+#include "../interpreters/whitespace/whitespace.h"
 #include <sys/types.h>
 
 ssize_t parse_whitespace_number(FILE *fptr){
