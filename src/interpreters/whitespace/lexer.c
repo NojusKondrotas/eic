@@ -16,28 +16,16 @@ int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_
 
     switch(key){
         case (TAB << 8) | TAB:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, IO_TT) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, IO_TT);
 
         case( SPACE << 8) | SPACE:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, IO_SS) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, IO_SS);
 
         case (TAB << 8) | SPACE:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, IO_TS) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, IO_TS);
 
         case (SPACE << 8) | TAB:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, IO_ST) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, IO_ST);
 
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: (ASCII: %zu %zu)\n", c1, c2);
@@ -56,34 +44,19 @@ int tokenize_arithmetic(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t 
 
     switch(key){
         case (SPACE << 8) | SPACE:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, AR_SS) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, AR_SS);
 
         case (SPACE << 8) | LF:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, AR_SL) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, AR_SL);
 
         case (TAB << 8) | TAB:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, AR_TT) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, AR_TT);
 
         case (TAB<< 8) | SPACE:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, AR_TS) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, AR_TS);
 
         case (SPACE << 8) | TAB:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, AR_ST) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, AR_ST);
 
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: (ASCII: %zu %zu)\n", c1, c2);
@@ -98,16 +71,10 @@ int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *token
 
     switch(c){
         case SPACE:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, HP_S) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, HP_S);
 
         case TAB:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, HP_T) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, HP_T);
 
         default:
             fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: (ASCII: %zu)\n", c);
@@ -134,22 +101,13 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
             key = WS_KEY(c1, c2);
             switch(key){
                 case (LF << 8) | SPACE:
-                    if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_LS) == EXIT_FAILURE)
-                        return EXIT_FAILURE;
-
-                    return EXIT_SUCCESS;
+                    return size_t_push_token(tokens, tokens_cap, tokens_count, SM_LS);
 
                 case (LF << 8) | TAB:
-                    if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_LT) == EXIT_FAILURE)
-                        return EXIT_FAILURE;
-
-                    return EXIT_SUCCESS;
+                    return size_t_push_token(tokens, tokens_cap, tokens_count, SM_LT);
 
                 case (LF << 8) | LF:
-                    if(size_t_push_token(tokens, tokens_cap, tokens_count, SM_LL) == EXIT_FAILURE)
-                        return EXIT_FAILURE;
-
-                    return EXIT_SUCCESS;
+                    return size_t_push_token(tokens, tokens_cap, tokens_count, SM_LL);
 
                 default:
                     fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2);
@@ -229,16 +187,10 @@ int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_
             return tokenize_ws_raw(fptr, tokens, tokens_cap, tokens_count);
 
         case (TAB << 8) | LF:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_TL) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, FC_TL);
 
         case (LF << 8) | LF:
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_LL) == EXIT_FAILURE)
-                return EXIT_FAILURE;
-
-            return EXIT_SUCCESS;
+            return size_t_push_token(tokens, tokens_cap, tokens_count, FC_LL);
         
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Flow Control command: (ASCII: %zu %zu)\n", c1, c2);
