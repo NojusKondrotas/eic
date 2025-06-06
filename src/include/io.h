@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int read_in_bf(size_t *);
+int read_in_bf(unsigned char *);
 
-int read_ws_command_char(FILE *, int *);
+int read_ws_command_char(FILE *, unsigned int *);
 
-int tokenize_ws_raw(FILE *, size_t **, size_t *, size_t *);
+int tokenize_ws_raw(FILE *, unsigned int **, size_t *, size_t *);
 
 #endif

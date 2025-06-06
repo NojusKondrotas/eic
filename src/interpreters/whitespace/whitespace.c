@@ -159,7 +159,7 @@ typedef struct{
 
 int execute_whitespace_file(FILE* fptr){
     size_t token_count;
-    size_t *tokens = tokenize_whitespace(fptr, &token_count);
+    unsigned int *tokens = tokenize_whitespace(fptr, &token_count);
     if(!tokens)
         return EXIT_FAILURE;
 
@@ -180,11 +180,128 @@ int execute_whitespace_file(FILE* fptr){
         return EXIT_FAILURE;
     }
 
-    size_t c;
+    unsigned int cmd;
     for(size_t i = 0; i < token_count; ++i){
-        size_t c = tokens[i];
-        printf("%zX\n", c);
+        cmd = tokens[i]; 
+        switch(cmd){
+            // Handle IO command
+            case IO_TS:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case IO_TT:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case IO_SS:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case IO_ST:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
 
+            // Handle Stack Manipulation command
+            case SM_S_n:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case SM_LS:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case SM_LT:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case SM_LL:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case SM_TS_n:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case SM_TL_n:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+
+            // Handle Arithmetic command
+            case AR_SS:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case AR_ST:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case AR_SL:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case AR_TS:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case AR_TT:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+
+            // Handle Flow Control command
+            case FC_SS_l:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case FC_ST_l:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case FC_SL_l:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case FC_TS_l:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case FC_TT_l:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case FC_TL:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case FC_LL:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+        }
     }
 
     free(stack);

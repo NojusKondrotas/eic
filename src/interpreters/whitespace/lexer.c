@@ -5,7 +5,7 @@
 #include "../../include/io.h"
 #include "../../include/stack.h"
 
-int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_io(FILE *fptr, unsigned int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -33,7 +33,7 @@ int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_
     }
 }
 
-int tokenize_arithmetic(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_arithmetic(FILE *fptr, unsigned int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -64,7 +64,7 @@ int tokenize_arithmetic(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t 
     }
 }
 
-int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_heap(FILE *fptr, unsigned int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c;
     if(read_ws_command_char(fptr, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -82,7 +82,7 @@ int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *token
     }
 }
 
-int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_stack_manip(FILE *fptr, unsigned int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1, c2;
     unsigned int key;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
@@ -144,7 +144,7 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
     }
 }
 
-int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_flow_control(FILE *fptr, unsigned int **tokens, size_t *tokens_cap, size_t *tokens_count){
     int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -166,7 +166,7 @@ int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_
             return tokenize_ws_raw(fptr, tokens, tokens_cap, tokens_count);
 
         case WS_KEY(SPACE, LF):
-            if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_Sl_l) == EXIT_FAILURE)
+            if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_SL_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens, tokens_cap, tokens_count);
@@ -195,9 +195,9 @@ int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_
     }
 }
 
-size_t *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
+unsigned int *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
     size_t tokens_cap = TOKENS_CAP, tokens_count = 0;
-    size_t *tokens = calloc(tokens_cap, sizeof(size_t));
+    unsigned int *tokens = calloc(tokens_cap, sizeof(unsigned int));
     if(!tokens){
         fprintf(stderr, "Failure allocating memory\n");
         return NULL;

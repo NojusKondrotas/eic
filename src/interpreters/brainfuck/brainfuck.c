@@ -33,7 +33,7 @@ int execute_bf_file(FILE *fptr){
 
     size_t pc = 0, memc = 0;
     
-    size_t c;
+    unsigned char c;
     while((c = fgetc(fptr)) != EOF){
         if(c != OP_JMP_FWD && c != OP_JMP_BCK && invalid_loop){
             ++pc;
@@ -60,7 +60,7 @@ int execute_bf_file(FILE *fptr){
                 --memory_tape[memc];
                 break;
             case OP_IN:
-                size_t val;
+                unsigned char val;
                 read_in_bf(&val);
                 memory_tape[memc] = val;
                 break;

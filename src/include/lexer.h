@@ -25,7 +25,7 @@
 
 #define FC_SS_l 0x30 //Mark a location in the program
 #define FC_ST_l 0x31 //Call a subroutine
-#define FC_Sl_l 0x32 //Jump unconditionally to a label
+#define FC_SL_l 0x32 //Jump unconditionally to a label
 #define FC_TS_l 0x33 //Jump to a label if the top of the stack is zero
 #define FC_TT_l 0x34 //Jump to a label if the top of the stack is negative
 #define FC_TL 0x35 //End a subroutine and transfer control back to the caller
@@ -40,6 +40,6 @@
 
 #define WS_KEY(a, b) (((unsigned char)(a) << 8) | (unsigned char)(b))
 
-size_t *tokenize_whitespace(FILE *, size_t *);
+unsigned int *tokenize_whitespace(FILE *, size_t *);
 
 #endif

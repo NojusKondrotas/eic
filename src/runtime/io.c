@@ -5,7 +5,7 @@
 #include "../include/whitespace.h"
 #include "../include/lexer.h"
 
-int read_in_bf(size_t *val){
+int read_in_bf(unsigned char *val){
     char in_data[4] = {0};
     *val = 0;
     if(fscanf(stdin, "%3s", in_data) != 1){
@@ -27,7 +27,7 @@ int read_in_bf(size_t *val){
     return EXIT_SUCCESS;
 }
 
-int read_ws_command_char(FILE *fptr, int *out_char){
+int read_ws_command_char(FILE *fptr, unsigned int *out_char){
     do {
         *out_char = fgetc(fptr);
         if (*out_char == EOF) {
@@ -39,7 +39,7 @@ int read_ws_command_char(FILE *fptr, int *out_char){
     return EXIT_SUCCESS;
 }
 
-int tokenize_ws_raw(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_ws_raw(FILE *fptr, unsigned int **tokens, size_t *tokens_cap, size_t *tokens_count){
     size_t c = fgetc(fptr);
     while(c != LF && c != EOF){
         switch (c) {

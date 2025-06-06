@@ -4,12 +4,8 @@
 #include <stdio.h>
 #include <stddef.h>
 
-int size_t_push_token(size_t **, size_t *, size_t *, size_t token);
+int size_t_push_token(unsigned int **, size_t *, size_t *, unsigned int token);
 
-int size_t_ensure_cap(size_t **, size_t *, size_t *);
-
-int ptrdiff_t_push_token(ptrdiff_t **, size_t *, size_t *, size_t token);
-
-int ptrdiff_t_ensure_cap(ptrdiff_t **, size_t *, size_t *);
+int size_t_ensure_cap(unsigned int **, size_t *, size_t *);
 
 #endif
