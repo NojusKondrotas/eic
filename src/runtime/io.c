@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "io.h"
-#include "stack.h"
-#include "../interpreters/whitespace/whitespace.h"
-#include "../interpreters/whitespace/lexer.h"
+#include "../include/io.h"
+#include "../include/stack.h"
+#include "../include/whitespace.h"
+#include "../include/lexer.h"
 
 unsigned int read_in_bf(){
     char in_data[3] = {0};

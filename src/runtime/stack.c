@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "stack.h"
+#include "../include/stack.h"
 
 int size_t_push_token(size_t **tokens, size_t *tokens_cap, size_t *tokens_count, size_t token){
     if(*tokens_cap == *tokens_count){

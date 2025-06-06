@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "../interpreters/whitespace/whitespace.h"
+#include "../include/whitespace.h"
 
 ptrdiff_t parse_whitespace_number(FILE *fptr){
     int sign;

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "eic.h"
-#include "interpreters//brainfuck/brainfuck.h"
-#include "interpreters/whitespace/whitespace.h"
+#include "include/eic.h"
+#include "include/brainfuck.h"
+#include "include/whitespace.h"
 
 int main(int argc, char *argv[]){
     if(argc != 2){

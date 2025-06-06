@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "whitespace.h"
-#include "lexer.h"
-#include "../../runtime/io.h"
-#include "../../runtime/stack.h"
+#include "../../include/whitespace.h"
+#include "../../include/lexer.h"
+#include "../../include/io.h"
+#include "../../include/stack.h"
 
 int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
     size_t c1, c2;

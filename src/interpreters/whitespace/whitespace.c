@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "whitespace.h"
-#include "../../runtime/numerics.h"
-#include "../../runtime/stack.h"
-#include "lexer.h"
+#include "../../include/whitespace.h"
+#include "../../include/numerics.h"
+#include "../../include/stack.h"
+#include "../../include/lexer.h"
 
 // void print_stack(ssize_t *stack, size_t stack_top) {
 //     printf("Stack [");

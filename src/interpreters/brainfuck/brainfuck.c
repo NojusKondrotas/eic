@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "brainfuck.h"
-#include "../../runtime/io.h"
+#include "../../include/brainfuck.h"
+#include "../../include/io.h"
 
 
 typedef enum{
