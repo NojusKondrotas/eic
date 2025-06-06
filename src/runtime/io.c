@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "io.h"
+#include "stack.h"
 #include "../interpreters/whitespace/whitespace.h"
+#include "../interpreters/whitespace/lexer.h"
 
 unsigned int read_in_bf(){
     char in_data[3] = {0};
@@ -28,6 +30,32 @@ int read_ws_command_char(FILE *fptr, size_t *out_char){
             return EXIT_FAILURE;
         }
     } while(*out_char != SPACE && *out_char != TAB && *out_char != LF);
+
+    return EXIT_SUCCESS;
+}
+
+int tokenize_ws_raw(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
+    size_t c = fgetc(fptr);
+    while(c != LF && c != EOF){
+        switch (c) {
+            case SPACE:
+                if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                break;
+
+            case TAB:
+                if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                break;
+        }
+
+        c = fgetc(fptr);
+    }
+
+    if(c == EOF){
+        fprintf(stderr, "Encountered unexpected EOF\n");
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
