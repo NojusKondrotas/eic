@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-unsigned int read_in_bf();
+int read_in_bf(size_t *);
 
 int read_ws_command_char(FILE *, size_t *);
 

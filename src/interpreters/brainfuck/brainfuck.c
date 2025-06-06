@@ -62,7 +62,9 @@ int execute_bf_file(FILE *fptr){
                 --memory_tape[memc];
                 break;
             case OP_IN:
-                memory_tape[memc] = read_in_bf();
+                size_t val;
+                read_in_bf(&val);
+                memory_tape[memc] = val;
                 break;
             case OP_OUT:
                 putchar(memory_tape[memc]);

@@ -5,21 +5,26 @@
 #include "../include/whitespace.h"
 #include "../include/lexer.h"
 
-unsigned int read_in_bf(){
-    char in_data[3] = {0};
-    unsigned int num_val = 0;
-    fscanf(stdin, "%3s", in_data);
-
-    if(in_data[0] < 48 || in_data[0] > 57)
-        return in_data[0];
-    
-    int i = 0;
-    while(in_data[i] > 47 && in_data[i] < 58){
-        num_val *= 10;
-        num_val += in_data[i++] - 48;
+int read_in_bf(size_t *val){
+    char in_data[4] = {0};
+    *val = 0;
+    if(fscanf(stdin, "%3s", in_data) != 1){
+        fprintf(stderr, "Reading from stdin was unsuccessful\n");
+        return EXIT_FAILURE;
     }
 
-    return num_val;
+    if(in_data[0] < 48 || in_data[0] > 57){
+        *val = (unsigned char)in_data[0];
+        return EXIT_SUCCESS;
+    }
+    
+    size_t i = 0;
+    while(in_data[i] > 47 && in_data[i] < 58){
+        *val *= 10;
+        *val += in_data[i++] - 48;
+    }
+
+    return EXIT_SUCCESS;
 }
 
 int read_ws_command_char(FILE *fptr, size_t *out_char){
