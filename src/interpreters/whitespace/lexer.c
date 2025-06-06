@@ -6,13 +6,13 @@
 #include "../../include/stack.h"
 
 int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    size_t c1, c2;
+    int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
     
-    size_t key = WS_KEY(c1, c2);
+    unsigned int key = WS_KEY(c1, c2);
 
     switch(key){
         case WS_KEY(TAB, TAB):
@@ -28,19 +28,19 @@ int tokenize_io(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_
             return size_t_push_token(tokens, tokens_cap, tokens_count, IO_ST);
 
         default:
-            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: (ASCII: %zu %zu)\n", c1, c2);
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
             return EXIT_FAILURE;
     }
 }
 
 int tokenize_arithmetic(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    size_t c1, c2;
+    int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    size_t key = WS_KEY(c1, c2);
+    unsigned int key = WS_KEY(c1, c2);
 
     switch(key){
         case WS_KEY(SPACE, SPACE):
@@ -59,13 +59,13 @@ int tokenize_arithmetic(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t 
             return size_t_push_token(tokens, tokens_cap, tokens_count, AR_ST);
 
         default:
-            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: (ASCII: %zu %zu)\n", c1, c2);
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
             return EXIT_FAILURE;
     }
 }
 
 int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    size_t c;
+    int c;
     if(read_ws_command_char(fptr, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
@@ -77,13 +77,14 @@ int tokenize_heap(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *token
             return size_t_push_token(tokens, tokens_cap, tokens_count, HP_T);
 
         default:
-            fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: (ASCII: %zu)\n", c);
+            fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: (ASCII: %u)\n", (unsigned char)c);
             return EXIT_FAILURE;
     }
 }
 
 int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    size_t c1, c2, key;
+    int c1, c2;
+    unsigned int key;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
@@ -110,7 +111,7 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
                     return size_t_push_token(tokens, tokens_cap, tokens_count, SM_LL);
 
                 default:
-                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2);
+                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
                     return EXIT_FAILURE;
             }
 
@@ -133,24 +134,24 @@ int tokenize_stack_manip(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t
                     return tokenize_ws_raw(fptr, tokens, tokens_cap, tokens_count);
 
                 default:
-                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %zu %zu)\n", c1, c2);
+                    fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
                     return EXIT_FAILURE;
             }
 
         default:
-            fprintf(stderr, "Unrecognised character while tokenizing whitespace Stack Manipulation command: (ASCII: %zu)\n", c1);
+            fprintf(stderr, "Unrecognised character while tokenizing whitespace Stack Manipulation command: (ASCII: %u)\n", (unsigned char)c1);
             return EXIT_FAILURE;
     }
 }
 
 int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_t *tokens_count){
-    size_t c1, c2;
+    int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
         return EXIT_FAILURE;
     
-    size_t key = WS_KEY(c1, c2);
+    unsigned int key = WS_KEY(c1, c2);
     switch(key){
         case WS_KEY(SPACE, SPACE):
             if(size_t_push_token(tokens, tokens_cap, tokens_count, FC_SS_l) == EXIT_FAILURE)
@@ -189,7 +190,7 @@ int tokenize_flow_control(FILE *fptr, size_t **tokens, size_t *tokens_cap, size_
             return size_t_push_token(tokens, tokens_cap, tokens_count, FC_LL);
         
         default:
-            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Flow Control command: (ASCII: %zu %zu)\n", c1, c2);
+            fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Flow Control command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
             return EXIT_FAILURE;
     }
 }
@@ -202,7 +203,7 @@ size_t *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
         return NULL;
     }
     
-    size_t imp_c1, imp_c2;
+    int imp_c1, imp_c2;
 
     while((imp_c1 = fgetc(fptr)) != EOF){
         switch(imp_c1){
@@ -212,7 +213,7 @@ size_t *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
                     return NULL;
                 }
 
-                size_t key = WS_KEY(imp_c1, imp_c2);
+                unsigned int key = WS_KEY(imp_c1, imp_c2);
                 switch(key){
                     case WS_KEY(TAB, LF):
                         if(tokenize_io(fptr, &tokens, &tokens_cap, &tokens_count) == EXIT_FAILURE){
@@ -239,7 +240,7 @@ size_t *tokenize_whitespace(FILE *fptr, size_t *out_tokens_count){
                         break;
 
                     default:
-                        fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IMP: (ASCII: %zu %zu)\n", imp_c1, imp_c2);
+                        fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IMP: (ASCII: %u %u)\n", (unsigned char)imp_c1, (unsigned char)imp_c2);
                         free(tokens);
                         return NULL;
                 }
