@@ -8,6 +8,6 @@ int read_in_bf(unsigned char *);
 
 int read_ws_command_char(FILE *, unsigned int *);
 
-int tokenize_ws_raw(FILE *, unsigned int **, size_t *, size_t *);
+int tokenize_ws_raw(FILE *, UnsignedStack *);
 
 #endif

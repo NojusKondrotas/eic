@@ -6,6 +6,20 @@
 #include "../../include/stack.h"
 #include "../../include/lexer.h"
 
+void free_resources(UnsignedStack *tokens, SignedStack *stack, ptrdiff_t *heap, Label *labels){
+    if(tokens->arr)
+        free(tokens->arr);
+    
+    if(stack->arr)
+        free(stack->arr);
+
+    if(heap)
+        free(heap);
+
+    if(labels)
+        free(labels);
+}
+
 // void print_stack(ssize_t *stack, size_t stack_top) {
 //     printf("Stack [");
 //     for (size_t i = 0; i < stack_top; ++i) {
@@ -158,31 +172,38 @@ typedef struct{
 // }
 
 int execute_whitespace_file(FILE* fptr){
-    size_t token_count;
-    unsigned int *tokens = tokenize_whitespace(fptr, &token_count);
-    if(!tokens)
+    UnsignedStack tokens;
+    SignedStack stack;
+    ptrdiff_t *heap;
+    Label *labels;
+    if(tokenize_whitespace(fptr, &tokens) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    size_t stack_cap = STACK_CAP, stack_top = 0, heap_cap = HEAP_CAP, labels_cap = LABELS_CAP;
-    ptrdiff_t *stack = calloc(stack_cap, sizeof(ptrdiff_t));
-    if(!stack){
+    stack = (SignedStack){.capacity = STACK_CAP, .count = 0, .arr = calloc(STACK_CAP, sizeof(ptrdiff_t)) };
+    if(!stack.arr){
         fprintf(stderr, "Failure allocating memory\n");
+        free_resources(&tokens, &stack, heap, labels);
         return EXIT_FAILURE;
     }
-    ptrdiff_t *heap = calloc(heap_cap, sizeof(ptrdiff_t));
+    size_t heap_cap = LABELS_CAP, heap_count = 0;
+    heap = calloc(HEAP_CAP, sizeof(ptrdiff_t));
     if(!heap){
+        free_resources(&tokens, &stack, heap, labels);
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
     }
-    Label *labels = calloc(labels_cap, sizeof(Label));
+    size_t labels_cap = LABELS_CAP, labels_count = 0;
+    labels = calloc(LABELS_CAP, sizeof(Label));
     if(!labels){
         fprintf(stderr, "Failure allocating memory\n");
+        free_resources(&tokens, &stack, heap, labels);
         return EXIT_FAILURE;
     }
 
     unsigned int cmd;
-    for(size_t i = 0; i < token_count; ++i){
-        cmd = tokens[i]; 
+    size_t tokens_count = tokens.count;
+    for(size_t i = 0; i < tokens_count; ++i){
+        cmd = tokens.arr[i];
         switch(cmd){
             // Handle IO command
             case IO_TS:
@@ -301,13 +322,26 @@ int execute_whitespace_file(FILE* fptr){
                     //return exit_failure;
                     
                 break;
+
+            // Handle Heap command
+            case HP_S:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            case HP_T:
+                //if(handle == exit_failure)
+                    //return exit_failure;
+                    
+                break;
+            
+            default:
+                //handle
+                break;
         }
     }
 
-    free(stack);
-    free(heap);
-    free(labels);
-    free(tokens);
+    free_resources(&tokens, &stack, heap, labels);
 
     return EXIT_SUCCESS;
 }

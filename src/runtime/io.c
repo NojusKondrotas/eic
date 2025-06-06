@@ -39,17 +39,17 @@ int read_ws_command_char(FILE *fptr, unsigned int *out_char){
     return EXIT_SUCCESS;
 }
 
-int tokenize_ws_raw(FILE *fptr, unsigned int **tokens, size_t *tokens_cap, size_t *tokens_count){
+int tokenize_ws_raw(FILE *fptr, UnsignedStack *tokens){
     size_t c = fgetc(fptr);
     while(c != LF && c != EOF){
         switch (c) {
             case SPACE:
-                if(size_t_push_token(tokens, tokens_cap, tokens_count, SPACE_RAW) == EXIT_FAILURE)
+                if(push_unsigned(tokens, SPACE_RAW) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                 break;
 
             case TAB:
-                if (size_t_push_token(tokens, tokens_cap, tokens_count, TAB_RAW) == EXIT_FAILURE)
+                if (push_unsigned(tokens, TAB_RAW) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                 break;
         }

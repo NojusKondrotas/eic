@@ -4,8 +4,22 @@
 #include <stdio.h>
 #include <stddef.h>
 
-int size_t_push_token(unsigned int **, size_t *, size_t *, unsigned int token);
+typedef struct{
+    size_t capacity, count;
+    size_t *arr;
+}UnsignedStack;
 
-int size_t_ensure_cap(unsigned int **, size_t *, size_t *);
+typedef struct{
+    size_t capacity, count;
+    ptrdiff_t *arr;
+}SignedStack;
+
+int push_unsigned(UnsignedStack *, size_t);
+
+int ensure_cap_unsigned(UnsignedStack *);
+
+int push_signed(SignedStack *, ptrdiff_t);
+
+int ensure_cap_signed(SignedStack *);
 
 #endif
