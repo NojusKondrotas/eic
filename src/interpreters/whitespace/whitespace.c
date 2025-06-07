@@ -203,7 +203,7 @@ int execute_whitespace_file(FILE* fptr){
     ptrdiff_t num;
     unsigned char ch;
     while(next(&tokens_iter)){
-        cmd = tokens_iter.elements[tokens_iter.index];
+        cmd = tokens_iter.elements[tokens_iter.index++];
         printf("%X\n", cmd);
         switch(cmd){
             // Handle IO command
@@ -279,7 +279,15 @@ int execute_whitespace_file(FILE* fptr){
 
             // Handle Stack Manipulation command
             case SM_S_n:
-                
+                if(parse_whitespace_number(&tokens_iter, &num) == EXIT_FAILURE){
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                if(push_signed(&stack, num) == EXIT_FAILURE){
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
                     
                 break;
             case SM_LS:
@@ -388,8 +396,6 @@ int execute_whitespace_file(FILE* fptr){
                 //handle
                 break;
         }
-
-        ++tokens_iter.index;
     }
 
     free_resources(&tokens_iter, &stack, heap, labels);

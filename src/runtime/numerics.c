@@ -6,12 +6,13 @@
 #include "../include/stack.h"
 #include "../include/whitespace.h"
 
-ptrdiff_t parse_whitespace_number(Iterator *tokens_iter, ptrdiff_t *number){
+int parse_whitespace_number(Iterator *tokens_iter, ptrdiff_t *number){
     unsigned int c;
     int sign;
+    *number = 0;
 
     if(next(tokens_iter)){
-        c = tokens_iter->elements[tokens_iter->index];
+        c = tokens_iter->elements[tokens_iter->index++];
         switch(c){
             case SPACE_RAW:
                 sign = 1;
@@ -25,21 +26,19 @@ ptrdiff_t parse_whitespace_number(Iterator *tokens_iter, ptrdiff_t *number){
         }
     }
 
-    while(next(tokens_iter) && (c = tokens_iter->elements[tokens_iter->index]) != EOF){
+    while(next(tokens_iter) && (c = tokens_iter->elements[tokens_iter->index++]) != EOF){
         switch(c){
-            case SPACE:
+            case SPACE_RAW:
                 *number <<= 1;
                 break;
-            case TAB:
+            case TAB_RAW:
                 *number <<= 1;
-                ++number;
+                ++*number;
                 break;
-            case LF:
+            case LF_RAW:
                 *number *= sign;
                 return EXIT_SUCCESS;
         }
-
-        ++tokens_iter->index;
     }
     
     fprintf(stderr, "EOF encountered while parsing a number\n");

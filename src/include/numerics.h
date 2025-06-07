@@ -4,6 +4,6 @@
 #include <stdio.h>
 #include <stddef.h>
 
-ptrdiff_t parse_whitespace_number(Iterator *);
+int parse_whitespace_number(Iterator *, ptrdiff_t *);
 
 #endif
