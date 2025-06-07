@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include "../../include/io.h"
 #include "../../include/whitespace.h"
 #include "../../include/numerics.h"
 #include "../../include/stack.h"
@@ -28,10 +29,6 @@ void free_resources(UnsignedStack *tokens, SignedStack *stack, ptrdiff_t *heap, 
 //     }
 //     printf("]\n");
 // }
-
-typedef struct{
-    size_t Spaces, Tabs, instruction_index;
-}Label;
 
 // void handle_flow_control(FILE *fptr, ssize_t *stack, Label *labels){
 
@@ -201,29 +198,81 @@ int execute_whitespace_file(FILE* fptr){
     }
 
     unsigned int cmd;
-    size_t tokens_count = tokens.count;
+    // Utility variables
+    size_t heap_addr, tokens_count = tokens.count;
+    ptrdiff_t num;
+    unsigned char ch;
     for(size_t i = 0; i < tokens_count; ++i){
         cmd = tokens.arr[i];
         switch(cmd){
             // Handle IO command
             case IO_TS:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count == 0){
+                    fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
+                    free_resources(&tokens, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                heap_addr = stack.arr[--stack.count];
+
+                if(read_in_char_ws(&ch) == EXIT_FAILURE){
+                    free_resources(&tokens, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                if(heap_addr >= heap_count){
+                    fprintf(stderr, "Heap address out of bounds\n");
+                    free_resources(&tokens, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                heap[heap_addr] = ch;
                     
                 break;
             case IO_TT:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count == 0){
+                    fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
+                    free_resources(&tokens, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                heap_addr = stack.arr[--stack.count];
+
+                num = 0;
+                if(read_in_number_ws(&num) == EXIT_FAILURE){
+                    free_resources(&tokens, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                if(heap_addr >= heap_count){
+                    fprintf(stderr, "Heap address out of bounds\n");
+                    free_resources(&tokens, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                heap[heap_addr] = num;
                     
                 break;
             case IO_SS:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count == 0){
+                    fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
+                    free_resources(&tokens, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                ch = stack.arr[--stack.count];
+
+                if(out_char_ws(ch) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
                     
                 break;
             case IO_ST:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count == 0){
+                    fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
+                    free_resources(&tokens, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                num = stack.arr[--stack.count];
+
+                if(out_number_ws(num) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
                     
                 break;
 

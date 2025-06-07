@@ -9,6 +9,10 @@
 #define HEAP_CAP 16
 #define LABELS_CAP 8
 
+typedef struct{
+    size_t Spaces, Tabs, instruction_index;
+}Label;
+
 int execute_whitespace(char *);
 
 #endif
