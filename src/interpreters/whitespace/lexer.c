@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "../../include/iterator.h"
 #include "../../include/whitespace.h"
 #include "../../include/lexer.h"
 #include "../../include/io.h"
 #include "../../include/stack.h"
 
-int tokenize_io(FILE *fptr, UnsignedStack *tokens){
+int tokenize_io(FILE *fptr, Iterator *tokens){
     int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -16,16 +17,16 @@ int tokenize_io(FILE *fptr, UnsignedStack *tokens){
 
     switch(key){
         case WS_KEY(TAB, TAB):
-            return push_unsigned(tokens, IO_TT);
+            return iter_ctor_add(tokens, IO_TT);
 
         case WS_KEY( SPACE, SPACE):
-            return push_unsigned(tokens, IO_SS);
+            return iter_ctor_add(tokens, IO_SS);
 
         case WS_KEY(TAB, SPACE):
-            return push_unsigned(tokens, IO_TS);
+            return iter_ctor_add(tokens, IO_TS);
 
         case WS_KEY(SPACE, TAB):
-            return push_unsigned(tokens, IO_ST);
+            return iter_ctor_add(tokens, IO_ST);
 
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
@@ -33,7 +34,7 @@ int tokenize_io(FILE *fptr, UnsignedStack *tokens){
     }
 }
 
-int tokenize_arithmetic(FILE *fptr, UnsignedStack *tokens){
+int tokenize_arithmetic(FILE *fptr, Iterator *tokens){
     int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -44,19 +45,19 @@ int tokenize_arithmetic(FILE *fptr, UnsignedStack *tokens){
 
     switch(key){
         case WS_KEY(SPACE, SPACE):
-            return push_unsigned(tokens, AR_SS);
+            return iter_ctor_add(tokens, AR_SS);
 
         case WS_KEY(SPACE, LF):
-            return push_unsigned(tokens, AR_SL);
+            return iter_ctor_add(tokens, AR_SL);
 
         case WS_KEY(TAB, TAB):
-            return push_unsigned(tokens, AR_TT);
+            return iter_ctor_add(tokens, AR_TT);
 
         case WS_KEY(TAB, SPACE):
-            return push_unsigned(tokens, AR_TS);
+            return iter_ctor_add(tokens, AR_TS);
 
         case WS_KEY(SPACE, TAB):
-            return push_unsigned(tokens, AR_ST);
+            return iter_ctor_add(tokens, AR_ST);
 
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
@@ -64,17 +65,17 @@ int tokenize_arithmetic(FILE *fptr, UnsignedStack *tokens){
     }
 }
 
-int tokenize_heap(FILE *fptr, UnsignedStack *tokens){
+int tokenize_heap(FILE *fptr, Iterator *tokens){
     int c;
     if(read_ws_command_char(fptr, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
     switch(c){
         case SPACE:
-            return push_unsigned(tokens, HP_S);
+            return iter_ctor_add(tokens, HP_S);
 
         case TAB:
-            return push_unsigned(tokens, HP_T);
+            return iter_ctor_add(tokens, HP_T);
 
         default:
             fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: (ASCII: %u)\n", (unsigned char)c);
@@ -82,7 +83,7 @@ int tokenize_heap(FILE *fptr, UnsignedStack *tokens){
     }
 }
 
-int tokenize_stack_manip(FILE *fptr, UnsignedStack *tokens){
+int tokenize_stack_manip(FILE *fptr, Iterator *tokens){
     int c1, c2;
     unsigned int key;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
@@ -90,7 +91,7 @@ int tokenize_stack_manip(FILE *fptr, UnsignedStack *tokens){
 
     switch(c1){
         case SPACE:
-            if(push_unsigned(tokens, SM_S_n) == EXIT_FAILURE)
+            if(iter_ctor_add(tokens, SM_S_n) == EXIT_FAILURE)
                 return EXIT_FAILURE;
             
             return tokenize_ws_raw(fptr, tokens);
@@ -102,13 +103,13 @@ int tokenize_stack_manip(FILE *fptr, UnsignedStack *tokens){
             key = WS_KEY(c1, c2);
             switch(key){
                 case WS_KEY(LF, SPACE):
-                    return push_unsigned(tokens, SM_LS);
+                    return iter_ctor_add(tokens, SM_LS);
 
                 case WS_KEY(LF, TAB):
-                    return push_unsigned(tokens, SM_LT);
+                    return iter_ctor_add(tokens, SM_LT);
 
                 case WS_KEY(LF, LF):
-                    return push_unsigned(tokens, SM_LL);
+                    return iter_ctor_add(tokens, SM_LL);
 
                 default:
                     fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
@@ -122,13 +123,13 @@ int tokenize_stack_manip(FILE *fptr, UnsignedStack *tokens){
             key = WS_KEY(c1, c2);
             switch(key){
                 case WS_KEY(TAB, SPACE):
-                    if(push_unsigned(tokens, SM_TS_n) == EXIT_FAILURE)
+                    if(iter_ctor_add(tokens, SM_TS_n) == EXIT_FAILURE)
                         return EXIT_FAILURE;
 
                     return tokenize_ws_raw(fptr, tokens);
 
                 case WS_KEY(TAB, LF):
-                    if(push_unsigned(tokens, SM_TL_n) == EXIT_FAILURE)
+                    if(iter_ctor_add(tokens, SM_TL_n) == EXIT_FAILURE)
                         return EXIT_FAILURE;
 
                     return tokenize_ws_raw(fptr, tokens);
@@ -144,7 +145,7 @@ int tokenize_stack_manip(FILE *fptr, UnsignedStack *tokens){
     }
 }
 
-int tokenize_flow_control(FILE *fptr, UnsignedStack *tokens){
+int tokenize_flow_control(FILE *fptr, Iterator *tokens){
     int c1, c2;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -154,40 +155,40 @@ int tokenize_flow_control(FILE *fptr, UnsignedStack *tokens){
     unsigned int key = WS_KEY(c1, c2);
     switch(key){
         case WS_KEY(SPACE, SPACE):
-            if(push_unsigned(tokens, FC_SS_l) == EXIT_FAILURE)
+            if(iter_ctor_add(tokens, FC_SS_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
         
         case WS_KEY(SPACE, TAB):
-            if(push_unsigned(tokens, FC_ST_l) == EXIT_FAILURE)
+            if(iter_ctor_add(tokens, FC_ST_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(SPACE, LF):
-            if(push_unsigned(tokens, FC_SL_l) == EXIT_FAILURE)
+            if(iter_ctor_add(tokens, FC_SL_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, SPACE):
-            if(push_unsigned(tokens, FC_TS_l) == EXIT_FAILURE)
+            if(iter_ctor_add(tokens, FC_TS_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, TAB):
-            if(push_unsigned(tokens, FC_TT_l) == EXIT_FAILURE)
+            if(iter_ctor_add(tokens, FC_TT_l) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, LF):
-            return push_unsigned(tokens, FC_TL);
+            return iter_ctor_add(tokens, FC_TL);
 
         case WS_KEY(LF, LF):
-            return push_unsigned(tokens, FC_LL);
+            return iter_ctor_add(tokens, FC_LL);
         
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Flow Control command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
@@ -195,9 +196,9 @@ int tokenize_flow_control(FILE *fptr, UnsignedStack *tokens){
     }
 }
 
-int tokenize_whitespace(FILE *fptr, UnsignedStack *tokens){
-    *tokens = (UnsignedStack){.capacity = TOKENS_CAP, .count = 0, .arr = calloc(TOKENS_CAP, sizeof(size_t))};
-    if(!tokens->arr){
+int tokenize_whitespace(FILE *fptr, Iterator *tokens){
+    *tokens = (Iterator){.index = 0, .count = 0, .capacity = TOKENS_CAP, .elements = calloc(TOKENS_CAP, sizeof(size_t))};
+    if(!tokens->elements){
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
     }
@@ -208,7 +209,7 @@ int tokenize_whitespace(FILE *fptr, UnsignedStack *tokens){
         switch(imp_c1){
             case TAB:
                 if(read_ws_command_char(fptr, &imp_c2) == EXIT_FAILURE){
-                    free(tokens->arr);
+                    free(tokens->elements);
                     return EXIT_FAILURE;
                 }
 
@@ -216,7 +217,7 @@ int tokenize_whitespace(FILE *fptr, UnsignedStack *tokens){
                 switch(key){
                     case WS_KEY(TAB, LF):
                         if(tokenize_io(fptr, tokens) == EXIT_FAILURE){
-                            free(tokens->arr);
+                            free(tokens->elements);
                             return EXIT_FAILURE;
                         }
 
@@ -224,7 +225,7 @@ int tokenize_whitespace(FILE *fptr, UnsignedStack *tokens){
 
                     case WS_KEY(TAB, SPACE):
                         if(tokenize_arithmetic(fptr, tokens) == EXIT_FAILURE){
-                            free(tokens->arr);
+                            free(tokens->elements);
                             return EXIT_FAILURE;
                         }
 
@@ -232,7 +233,7 @@ int tokenize_whitespace(FILE *fptr, UnsignedStack *tokens){
 
                     case WS_KEY(TAB, TAB):
                         if(tokenize_heap(fptr, tokens) == EXIT_FAILURE){
-                            free(tokens->arr);
+                            free(tokens->elements);
                             return EXIT_FAILURE;
                         }
 
@@ -240,21 +241,21 @@ int tokenize_whitespace(FILE *fptr, UnsignedStack *tokens){
 
                     default:
                         fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IMP: (ASCII: %u %u)\n", (unsigned char)imp_c1, (unsigned char)imp_c2);
-                        free(tokens->arr);
+                        free(tokens->elements);
                         return EXIT_FAILURE;
                 }
                 break;
 
             case SPACE:
                 if(tokenize_stack_manip(fptr, tokens) == EXIT_FAILURE){
-                    free(tokens->arr);
+                    free(tokens->elements);
                     return EXIT_FAILURE;
                 }
                 break;
 
             case LF:
                 if(tokenize_flow_control(fptr, tokens) == EXIT_FAILURE){
-                    free(tokens->arr);
+                    free(tokens->elements);
                     return EXIT_FAILURE;
                 }
                 break;

@@ -2,6 +2,7 @@
 #define LEXER_H
 
 #include <stdio.h>
+#include "iterator.h"
 #include "stack.h"
 
 #define TOKENS_CAP 20
@@ -41,6 +42,6 @@
 
 #define WS_KEY(a, b) (((unsigned char)(a) << 8) | (unsigned char)(b))
 
-int tokenize_whitespace(FILE *, UnsignedStack *);
+int tokenize_whitespace(FILE *, Iterator *);
 
 #endif

@@ -7,9 +7,9 @@
 #include "../../include/stack.h"
 #include "../../include/lexer.h"
 
-void free_resources(UnsignedStack *tokens, SignedStack *stack, ptrdiff_t *heap, Label *labels){
-    if(tokens->arr)
-        free(tokens->arr);
+void free_resources(Iterator *tokens, SignedStack *stack, ptrdiff_t *heap, Label *labels){
+    if(tokens->elements)
+        free(tokens->elements);
     
     if(stack->arr)
         free(stack->arr);
@@ -169,23 +169,23 @@ void free_resources(UnsignedStack *tokens, SignedStack *stack, ptrdiff_t *heap, 
 // }
 
 int execute_whitespace_file(FILE* fptr){
-    UnsignedStack tokens;
+    Iterator tokens_iter;
     SignedStack stack;
     ptrdiff_t *heap;
     Label *labels;
-    if(tokenize_whitespace(fptr, &tokens) == EXIT_FAILURE)
+    if(tokenize_whitespace(fptr, &tokens_iter) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
     stack = (SignedStack){.capacity = STACK_CAP, .count = 0, .arr = calloc(STACK_CAP, sizeof(ptrdiff_t)) };
     if(!stack.arr){
         fprintf(stderr, "Failure allocating memory\n");
-        free_resources(&tokens, &stack, heap, labels);
+        free_resources(&tokens_iter, &stack, heap, labels);
         return EXIT_FAILURE;
     }
     size_t heap_cap = LABELS_CAP, heap_count = 0;
     heap = calloc(HEAP_CAP, sizeof(ptrdiff_t));
     if(!heap){
-        free_resources(&tokens, &stack, heap, labels);
+        free_resources(&tokens_iter, &stack, heap, labels);
         fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
     }
@@ -193,35 +193,36 @@ int execute_whitespace_file(FILE* fptr){
     labels = calloc(LABELS_CAP, sizeof(Label));
     if(!labels){
         fprintf(stderr, "Failure allocating memory\n");
-        free_resources(&tokens, &stack, heap, labels);
+        free_resources(&tokens_iter, &stack, heap, labels);
         return EXIT_FAILURE;
     }
 
     unsigned int cmd;
     // Utility variables
-    size_t heap_addr, tokens_count = tokens.count;
+    size_t heap_addr;
     ptrdiff_t num;
     unsigned char ch;
-    for(size_t i = 0; i < tokens_count; ++i){
-        cmd = tokens.arr[i];
+    while(next(&tokens_iter)){
+        cmd = tokens_iter.elements[tokens_iter.index];
+        printf("%X\n", cmd);
         switch(cmd){
             // Handle IO command
             case IO_TS:
                 if(stack.count == 0){
                     fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
-                    free_resources(&tokens, &stack, heap, labels);
+                    free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
                 heap_addr = stack.arr[--stack.count];
 
                 if(read_in_char_ws(&ch) == EXIT_FAILURE){
-                    free_resources(&tokens, &stack, heap, labels);
+                    free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
 
                 if(heap_addr >= heap_count){
                     fprintf(stderr, "Heap address out of bounds\n");
-                    free_resources(&tokens, &stack, heap, labels);
+                    free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
 
@@ -231,20 +232,20 @@ int execute_whitespace_file(FILE* fptr){
             case IO_TT:
                 if(stack.count == 0){
                     fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
-                    free_resources(&tokens, &stack, heap, labels);
+                    free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
                 heap_addr = stack.arr[--stack.count];
 
                 num = 0;
                 if(read_in_number_ws(&num) == EXIT_FAILURE){
-                    free_resources(&tokens, &stack, heap, labels);
+                    free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
 
                 if(heap_addr >= heap_count){
                     fprintf(stderr, "Heap address out of bounds\n");
-                    free_resources(&tokens, &stack, heap, labels);
+                    free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
 
@@ -254,7 +255,7 @@ int execute_whitespace_file(FILE* fptr){
             case IO_SS:
                 if(stack.count == 0){
                     fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
-                    free_resources(&tokens, &stack, heap, labels);
+                    free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
                 ch = stack.arr[--stack.count];
@@ -266,7 +267,7 @@ int execute_whitespace_file(FILE* fptr){
             case IO_ST:
                 if(stack.count == 0){
                     fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
-                    free_resources(&tokens, &stack, heap, labels);
+                    free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
                 num = stack.arr[--stack.count];
@@ -278,8 +279,7 @@ int execute_whitespace_file(FILE* fptr){
 
             // Handle Stack Manipulation command
             case SM_S_n:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                
                     
                 break;
             case SM_LS:
@@ -388,9 +388,11 @@ int execute_whitespace_file(FILE* fptr){
                 //handle
                 break;
         }
+
+        ++tokens_iter.index;
     }
 
-    free_resources(&tokens, &stack, heap, labels);
+    free_resources(&tokens_iter, &stack, heap, labels);
 
     return EXIT_SUCCESS;
 }

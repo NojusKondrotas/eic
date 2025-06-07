@@ -1,42 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include "../include/iterator.h"
+#include "../include/lexer.h"
+#include "../include/stack.h"
 #include "../include/whitespace.h"
 
-ptrdiff_t parse_whitespace_number(FILE *fptr){
+ptrdiff_t parse_whitespace_number(Iterator *tokens_iter, ptrdiff_t *number){
+    unsigned int c;
     int sign;
-    ptrdiff_t number = 0;
 
-    size_t c = fgetc(fptr);
-
-    switch(c){
-        case SPACE:
-            sign = 1;
-            break;
-        case TAB:
-            sign = -1;
-            break;
-        default:
-            fprintf(stderr, "Unrecognised stack manipulation command\n");
-            exit(EXIT_FAILURE);
+    if(next(tokens_iter)){
+        c = tokens_iter->elements[tokens_iter->index];
+        switch(c){
+            case SPACE_RAW:
+                sign = 1;
+                break;
+            case TAB_RAW:
+                sign = -1;
+                break;
+            default:
+                fprintf(stderr, "Unrecognised stack manipulation command\n");
+                return EXIT_FAILURE;
+        }
     }
 
-    while((c = fgetc(fptr)) != EOF){
+    while(next(tokens_iter) && (c = tokens_iter->elements[tokens_iter->index]) != EOF){
         switch(c){
             case SPACE:
-                number <<= 1;
+                *number <<= 1;
                 break;
             case TAB:
-                number <<= 1;
+                *number <<= 1;
                 ++number;
                 break;
             case LF:
-                return number * sign;
-            default:
-                exit(EXIT_FAILURE);
+                *number *= sign;
+                return EXIT_SUCCESS;
         }
+
+        ++tokens_iter->index;
     }
     
     fprintf(stderr, "EOF encountered while parsing a number\n");
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
 }
