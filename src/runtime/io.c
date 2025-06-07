@@ -41,7 +41,7 @@ int read_ws_command_char(FILE *fptr, unsigned int *out_char){
 
 int tokenize_ws_raw(FILE *fptr, Iterator *iterator){
     size_t c = fgetc(fptr);
-    while(c != LF && c != EOF){
+    while(c != EOF){
         switch (c) {
             case SPACE:
                 if(iter_ctor_add(iterator, SPACE_RAW) == EXIT_FAILURE)
@@ -52,6 +52,8 @@ int tokenize_ws_raw(FILE *fptr, Iterator *iterator){
                 if (iter_ctor_add(iterator, TAB_RAW) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                 break;
+            case LF:
+                return iter_ctor_add(iterator, LF_RAW);
         }
 
         c = fgetc(fptr);
@@ -119,6 +121,8 @@ int out_char_ws(unsigned char ch){
     return EXIT_FAILURE;
 }
 
-int out_number_ws(ptrdiff_t){
-    return EXIT_FAILURE;
+int out_number_ws(ptrdiff_t number){
+    fprintf(stdout, "%td", number);
+
+    return EXIT_SUCCESS;
 }

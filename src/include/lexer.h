@@ -38,6 +38,7 @@
 
 #define SPACE_RAW 0x50
 #define TAB_RAW 0x51
+#define LF_RAW 0x52
 
 
 #define WS_KEY(a, b) (((unsigned char)(a) << 8) | (unsigned char)(b))
