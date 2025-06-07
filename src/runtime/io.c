@@ -64,3 +64,61 @@ int tokenize_ws_raw(FILE *fptr, UnsignedStack *tokens){
 
     return EXIT_SUCCESS;
 }
+
+int read_in_char_ws(unsigned char *ch){
+    int tmp = fgetc(stdin);
+    
+    if(tmp == EOF){
+        fprintf(stderr, "Encountered unexpected end of stream while reading Whitespace console input\n");
+        return EXIT_FAILURE;
+    }
+
+    while(fgetc(stdin) != LF);
+
+    *ch = tmp;
+
+    return EXIT_SUCCESS;
+}
+
+int read_in_number_ws(ptrdiff_t *num){
+    int sign, tmp = fgetc(stdin);
+    if(tmp == '-'){
+        sign = -1;
+        tmp = fgetc(stdin);
+    }
+    else if(tmp == '+'){
+        sign = 1;
+        tmp = fgetc(stdin);
+    }
+    else if(tmp > 47 && tmp < 58){
+        sign = 1;
+    }
+    else{
+        fprintf(stderr, "Unexpected character encountered while reading Whitespace input (ASCII: %d)\n", tmp);
+        return EXIT_FAILURE;
+    }
+    
+    while(tmp > 47 && tmp < 58){
+        *num *= 10;
+        *num += tmp - '0';
+
+        tmp = fgetc(stdin);
+        if(tmp == EOF){
+            fprintf(stderr, "Encountered unexpected end of stream while reading Whitespace console input\n");
+            return EXIT_FAILURE;
+        }
+    }
+
+    while(fgetc(stdin) != LF);
+
+    *num *= sign;
+    return EXIT_SUCCESS;
+}
+
+int out_char_ws(unsigned char ch){
+    return EXIT_FAILURE;
+}
+
+int out_number_ws(ptrdiff_t){
+    return EXIT_FAILURE;
+}

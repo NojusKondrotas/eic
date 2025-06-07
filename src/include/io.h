@@ -3,11 +3,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
+#include "stack.h"
 
 int read_in_bf(unsigned char *);
 
 int read_ws_command_char(FILE *, unsigned int *);
 
 int tokenize_ws_raw(FILE *, UnsignedStack *);
+
+int read_in_char_ws(unsigned char *);
+
+int read_in_number_ws(ptrdiff_t *);
+
+int out_char_ws(unsigned char);
+
+int out_number_ws(ptrdiff_t);
 
 #endif
