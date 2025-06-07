@@ -182,7 +182,7 @@ int execute_whitespace_file(FILE* fptr){
         free_resources(&tokens_iter, &stack, heap, labels);
         return EXIT_FAILURE;
     }
-    size_t heap_cap = LABELS_CAP, heap_count = 0;
+    size_t heap_cap = LABELS_CAP;
     heap = calloc(HEAP_CAP, sizeof(ptrdiff_t));
     if(!heap){
         free_resources(&tokens_iter, &stack, heap, labels);
@@ -199,8 +199,9 @@ int execute_whitespace_file(FILE* fptr){
 
     unsigned int cmd;
     // Utility variables
-    size_t heap_addr;
-    ptrdiff_t num;
+    size_t heap_addr, new_cap;
+    ptrdiff_t num, tmp;
+    ptrdiff_t *tmp_alloc;
     unsigned char ch;
     while(next(&tokens_iter)){
         cmd = tokens_iter.elements[tokens_iter.index++];
@@ -220,10 +221,19 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(heap_addr >= heap_count){
-                    fprintf(stderr, "Heap address out of bounds\n");
-                    free_resources(&tokens_iter, &stack, heap, labels);
-                    return EXIT_FAILURE;
+                if(heap_addr >= heap_cap){
+                    new_cap = heap_cap * 2;
+                    while(new_cap <= heap_addr)
+                        new_cap = heap_cap * 2;
+                        
+                    tmp_alloc = realloc(heap, new_cap * sizeof(ptrdiff_t));
+                    if(!tmp_alloc){
+                        fprintf(stderr, "Failure allocating memory\n");
+                        free_resources(&tokens_iter, &stack, heap, labels);
+                        return EXIT_FAILURE;
+                    }
+                    heap = tmp_alloc;
+                    heap_cap = new_cap;
                 }
 
                 heap[heap_addr] = ch;
@@ -237,16 +247,24 @@ int execute_whitespace_file(FILE* fptr){
                 }
                 heap_addr = stack.arr[--stack.count];
 
-                num = 0;
                 if(read_in_number_ws(&num) == EXIT_FAILURE){
                     free_resources(&tokens_iter, &stack, heap, labels);
                     return EXIT_FAILURE;
                 }
 
-                if(heap_addr >= heap_count){
-                    fprintf(stderr, "Heap address out of bounds\n");
-                    free_resources(&tokens_iter, &stack, heap, labels);
-                    return EXIT_FAILURE;
+                if(heap_addr >= heap_cap){
+                    new_cap = heap_cap * 2;
+                    while(new_cap <= heap_addr)
+                        new_cap = heap_cap * 2;
+                        
+                    tmp_alloc = realloc(heap, new_cap * sizeof(ptrdiff_t));
+                    if(!tmp_alloc){
+                        fprintf(stderr, "Failure allocating memory\n");
+                        free_resources(&tokens_iter, &stack, heap, labels);
+                        return EXIT_FAILURE;
+                    }
+                    heap = tmp_alloc;
+                    heap_cap = new_cap;
                 }
 
                 heap[heap_addr] = num;
@@ -291,28 +309,69 @@ int execute_whitespace_file(FILE* fptr){
                     
                 break;
             case SM_LS:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(ensure_cap_signed(&stack) == EXIT_FAILURE){
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                if(push_signed(&stack, stack.arr[stack.count - 1]) == EXIT_FAILURE){
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
                     
                 break;
             case SM_LT:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 2){
+                    fprintf(stderr, "Stack cannot have less than two items when performing a swap of its top items\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                tmp = stack.arr[stack.count - 2];
+                stack.arr[stack.count - 2] = stack.arr[stack.count - 1];
+                stack.arr[stack.count - 1] = tmp;
                     
                 break;
             case SM_LL:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 1){
+                    fprintf(stderr, "Stack count cannot be 0 when performing a pop operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                --stack.count;
                     
                 break;
             case SM_TS_n:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(parse_whitespace_number(&tokens_iter, &num) == EXIT_FAILURE){
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                if(num >= stack.count){
+                    fprintf(stderr, "Stack index out of bounds\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                
+                if(push_signed(&stack, num) == EXIT_FAILURE){
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
                     
                 break;
             case SM_TL_n:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(parse_whitespace_number(&tokens_iter, &num) == EXIT_FAILURE){
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                if(num >= stack.count){
+                    fprintf(stderr, "Given argument cannot be more than or equal to stack's item count when performing stack sliding\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                stack.count -= num;
                     
                 break;
 
@@ -382,13 +441,62 @@ int execute_whitespace_file(FILE* fptr){
 
             // Handle Heap command
             case HP_S:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 2){
+                    fprintf(stderr, "Stack count cannot be less than two when performing a heap storing operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                heap_addr = stack.arr[stack.count - 2];
+                num = stack.arr[stack.count - 1];
+                if(heap_addr >= heap_cap){
+                    new_cap = heap_cap * 2;
+                    while(new_cap <= heap_addr)
+                        new_cap = heap_cap * 2;
+                        
+                    tmp_alloc = realloc(heap, new_cap * sizeof(ptrdiff_t));
+                    if(!tmp_alloc){
+                        fprintf(stderr, "Failure allocating memory\n");
+                        free_resources(&tokens_iter, &stack, heap, labels);
+                        return EXIT_FAILURE;
+                    }
+                    heap = tmp_alloc;
+                    heap_cap = new_cap;
+                }
+
+                heap[heap_addr] = num;
+                stack.count -= 2;
                     
                 break;
             case HP_T:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 1){
+                    fprintf(stderr, "Stack count cannot be less than one when performing a heap retrieval operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                heap_addr = stack.arr[--stack.count];
+                if(heap_addr >= heap_cap){
+                    new_cap = heap_cap * 2;
+                    while(new_cap <= heap_addr)
+                        new_cap = heap_cap * 2;
+                        
+                    tmp_alloc = realloc(heap, new_cap * sizeof(ptrdiff_t));
+                    if(!tmp_alloc){
+                        fprintf(stderr, "Failure allocating memory\n");
+                        free_resources(&tokens_iter, &stack, heap, labels);
+                        return EXIT_FAILURE;
+                    }
+                    heap = tmp_alloc;
+                    heap_cap = new_cap;
+                }
+
+                num = heap[heap_addr];
+
+                if(push_signed(&stack, num) == EXIT_FAILURE){
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
                     
                 break;
             

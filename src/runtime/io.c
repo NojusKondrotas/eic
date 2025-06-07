@@ -84,6 +84,7 @@ int read_in_char_ws(unsigned char *ch){
 
 int read_in_number_ws(ptrdiff_t *num){
     int sign, tmp = fgetc(stdin);
+    *num = 0;
     if(tmp == '-'){
         sign = -1;
         tmp = fgetc(stdin);
@@ -117,10 +118,14 @@ int read_in_number_ws(ptrdiff_t *num){
     return EXIT_SUCCESS;
 }
 
+//TODO: add error handling
 int out_char_ws(unsigned char ch){
-    return EXIT_FAILURE;
+    fprintf(stdout, "%c", ch);
+
+    return EXIT_SUCCESS;
 }
 
+//TODO: add error handling
 int out_number_ws(ptrdiff_t number){
     fprintf(stdout, "%td", number);
 
