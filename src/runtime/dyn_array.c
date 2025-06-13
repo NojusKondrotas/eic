@@ -18,6 +18,9 @@ int dyn_array_init(DynArray* array, size_t cap, size_t element_size) {
 }
 
 void dyn_array_free(DynArray* array) {
+    if(array == NULL)
+        return;
+        
     free(array->data);
     array->data = NULL;
     array->capacity = 0;
