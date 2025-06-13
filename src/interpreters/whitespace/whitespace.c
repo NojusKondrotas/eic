@@ -203,6 +203,7 @@ int execute_whitespace_file(FILE* fptr){
     ptrdiff_t num, tmp;
     ptrdiff_t *tmp_alloc;
     unsigned char ch;
+
     while(next(&tokens_iter)){
         cmd = tokens_iter.elements[tokens_iter.index++];
         printf("%X\n", cmd);
@@ -377,28 +378,75 @@ int execute_whitespace_file(FILE* fptr){
 
             // Handle Arithmetic command
             case AR_SS:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 2){
+                    fprintf(stderr, "Stack cannot have less than two items when performing an arithmetic operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                
+                num = stack.arr[stack.count - 2] + stack.arr[stack.count - 1];
+                --stack.count;
+                stack.arr[stack.count - 1] = num;
                     
                 break;
             case AR_ST:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 2){
+                    fprintf(stderr, "Stack cannot have less than two items when performing an arithmetic operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                
+                num = stack.arr[stack.count - 2] - stack.arr[stack.count - 1];
+                --stack.count;
+                stack.arr[stack.count - 1] = num;
                     
                 break;
             case AR_SL:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 2){
+                    fprintf(stderr, "Stack cannot have less than two items when performing an arithmetic operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                
+                num = stack.arr[stack.count - 2] * stack.arr[stack.count - 1];
+                --stack.count;
+                stack.arr[stack.count - 1] = num;
                     
                 break;
             case AR_TS:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 2){
+                    fprintf(stderr, "Stack cannot have less than two items when performing an arithmetic operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                if(stack.arr[stack.count - 1] == 0){
+                    fprintf(stderr, "Stack's top item cannot be zero when performing an integer division operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+            
+                num = stack.arr[stack.count - 2] / stack.arr[stack.count - 1];
+                --stack.count;
+                stack.arr[stack.count - 1] = num;
                     
                 break;
             case AR_TT:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(stack.count < 2){
+                    fprintf(stderr, "Stack cannot have less than two items when performing an arithmetic operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+
+                if(stack.arr[stack.count - 1] == 0){
+                    fprintf(stderr, "Stack's top item cannot be zero when performing modulo operation\n");
+                    free_resources(&tokens_iter, &stack, heap, labels);
+                    return EXIT_FAILURE;
+                }
+                
+                num = stack.arr[stack.count - 2] % stack.arr[stack.count - 1];
+                --stack.count;
+                stack.arr[stack.count - 1] = num;
                     
                 break;
 
