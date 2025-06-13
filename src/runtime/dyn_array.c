@@ -57,7 +57,7 @@ int dyn_array_pop_back(DynArray* array) {
 }
 
 void* dyn_array_get(DynArray* array, size_t index) {
-    if (index >= array->size) {
+    if (index >= array->size || index < 0) {
         return NULL;
     }
     
