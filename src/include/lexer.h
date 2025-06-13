@@ -42,6 +42,6 @@
 
 #define WS_KEY(a, b) (((unsigned char)(a) << 8) | (unsigned char)(b))
 
-int tokenize_whitespace(FILE *, DynArray *);
+int tokenize_whitespace(FILE *, DynArray *, DynArray *);
 
 #endif
