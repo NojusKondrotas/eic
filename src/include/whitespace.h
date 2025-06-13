@@ -10,7 +10,8 @@
 #define LABELS_CAP 8
 
 typedef struct{
-    size_t Spaces, Tabs, instruction_index;
+    DynArray* id;
+    size_t instruction_index;
 }Label;
 
 int execute_whitespace(char *);
