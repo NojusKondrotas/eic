@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "../include/iterator.h"
 #include "../include/lexer.h"
-#include "../include/stack.h"
+#include "../include/dyn_array.h"
 #include "../include/whitespace.h"
 
-int parse_whitespace_number(Iterator *tokens_iter, ptrdiff_t *number){
+int parse_whitespace_number(DynArray *tokens, ptrdiff_t *number){
     unsigned int c;
     int sign;
     *number = 0;

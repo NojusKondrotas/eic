@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../include/iterator.h"
 #include "../../include/whitespace.h"
 #include "../../include/lexer.h"
 #include "../../include/io.h"
-#include "../../include/stack.h"
+#include "../../include/dyn_array.h"
 
-int tokenize_io(FILE *fptr, Iterator *tokens){
+int tokenize_io(FILE *fptr, DynArray *tokens){
     int c1, c2;
+    size_t val;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
@@ -17,16 +17,20 @@ int tokenize_io(FILE *fptr, Iterator *tokens){
 
     switch(key){
         case WS_KEY(TAB, TAB):
-            return iter_ctor_add(tokens, IO_TT);
+            val = IO_TT;
+            return dyn_array_push_back(tokens, &val);
 
         case WS_KEY( SPACE, SPACE):
-            return iter_ctor_add(tokens, IO_SS);
+            val = IO_SS;
+            return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(TAB, SPACE):
-            return iter_ctor_add(tokens, IO_TS);
+            val = IO_TS;
+            return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(SPACE, TAB):
-            return iter_ctor_add(tokens, IO_ST);
+            val = IO_ST;
+            return dyn_array_push_back(tokens, &val);
 
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IO command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
@@ -34,8 +38,9 @@ int tokenize_io(FILE *fptr, Iterator *tokens){
     }
 }
 
-int tokenize_arithmetic(FILE *fptr, Iterator *tokens){
+int tokenize_arithmetic(FILE *fptr, DynArray *tokens){
     int c1, c2;
+    size_t val;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
@@ -45,19 +50,24 @@ int tokenize_arithmetic(FILE *fptr, Iterator *tokens){
 
     switch(key){
         case WS_KEY(SPACE, SPACE):
-            return iter_ctor_add(tokens, AR_SS);
+            val = AR_SS;
+            return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(SPACE, LF):
-            return iter_ctor_add(tokens, AR_SL);
+            val = AR_SL;
+            return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(TAB, TAB):
-            return iter_ctor_add(tokens, AR_TT);
+            val = AR_TT;
+            return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(TAB, SPACE):
-            return iter_ctor_add(tokens, AR_TS);
+            val = AR_TS;
+            return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(SPACE, TAB):
-            return iter_ctor_add(tokens, AR_ST);
+            val = AR_ST;
+            return dyn_array_push_back(tokens, &val);
 
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Arithmetic command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
@@ -65,17 +75,20 @@ int tokenize_arithmetic(FILE *fptr, Iterator *tokens){
     }
 }
 
-int tokenize_heap(FILE *fptr, Iterator *tokens){
+int tokenize_heap(FILE *fptr, DynArray *tokens){
     int c;
+    size_t val;
     if(read_ws_command_char(fptr, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
     switch(c){
         case SPACE:
-            return iter_ctor_add(tokens, HP_S);
+            val = HP_S;
+            return dyn_array_push_back(tokens, &val);
 
         case TAB:
-            return iter_ctor_add(tokens, HP_T);
+            val = HP_T;
+            return dyn_array_push_back(tokens, &val);
 
         default:
             fprintf(stderr, "Unrecognised character while tokenizing whitespace Heap Access command: (ASCII: %u)\n", (unsigned char)c);
@@ -83,15 +96,17 @@ int tokenize_heap(FILE *fptr, Iterator *tokens){
     }
 }
 
-int tokenize_stack_manip(FILE *fptr, Iterator *tokens){
+int tokenize_stack_manip(FILE *fptr, DynArray *tokens){
     int c1, c2;
     unsigned int key;
+    size_t val;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
     switch(c1){
         case SPACE:
-            if(iter_ctor_add(tokens, SM_S_n) == EXIT_FAILURE)
+            val = SM_S_n;
+            if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
             
             return tokenize_ws_raw(fptr, tokens);
@@ -103,13 +118,16 @@ int tokenize_stack_manip(FILE *fptr, Iterator *tokens){
             key = WS_KEY(c1, c2);
             switch(key){
                 case WS_KEY(LF, SPACE):
-                    return iter_ctor_add(tokens, SM_LS);
+                    val = SM_LS;
+                    return dyn_array_push_back(tokens, &val);
 
                 case WS_KEY(LF, TAB):
-                    return iter_ctor_add(tokens, SM_LT);
+                    val = SM_LT;
+                    return dyn_array_push_back(tokens, &val);
 
                 case WS_KEY(LF, LF):
-                    return iter_ctor_add(tokens, SM_LL);
+                    val = SM_LL;
+                    return dyn_array_push_back(tokens, &val);
 
                 default:
                     fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Stack Manipulation command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
@@ -123,13 +141,15 @@ int tokenize_stack_manip(FILE *fptr, Iterator *tokens){
             key = WS_KEY(c1, c2);
             switch(key){
                 case WS_KEY(TAB, SPACE):
-                    if(iter_ctor_add(tokens, SM_TS_n) == EXIT_FAILURE)
+                    val = SM_TS_n;
+                    if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                         return EXIT_FAILURE;
 
                     return tokenize_ws_raw(fptr, tokens);
 
                 case WS_KEY(TAB, LF):
-                    if(iter_ctor_add(tokens, SM_TL_n) == EXIT_FAILURE)
+                    val = SM_TL_n;
+                    if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                         return EXIT_FAILURE;
 
                     return tokenize_ws_raw(fptr, tokens);
@@ -145,8 +165,9 @@ int tokenize_stack_manip(FILE *fptr, Iterator *tokens){
     }
 }
 
-int tokenize_flow_control(FILE *fptr, Iterator *tokens){
+int tokenize_flow_control(FILE *fptr, DynArray *tokens){
     int c1, c2;
+    size_t val;
     if(read_ws_command_char(fptr, &c1) == EXIT_FAILURE)
         return EXIT_FAILURE;
     if(read_ws_command_char(fptr, &c2) == EXIT_FAILURE)
@@ -155,40 +176,47 @@ int tokenize_flow_control(FILE *fptr, Iterator *tokens){
     unsigned int key = WS_KEY(c1, c2);
     switch(key){
         case WS_KEY(SPACE, SPACE):
-            if(iter_ctor_add(tokens, FC_SS_l) == EXIT_FAILURE)
+            val = FC_SS_l;
+            if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
         
         case WS_KEY(SPACE, TAB):
-            if(iter_ctor_add(tokens, FC_ST_l) == EXIT_FAILURE)
+            val = FC_ST_l;
+            if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(SPACE, LF):
-            if(iter_ctor_add(tokens, FC_SL_l) == EXIT_FAILURE)
+            val = FC_SL_l;
+            if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, SPACE):
-            if(iter_ctor_add(tokens, FC_TS_l) == EXIT_FAILURE)
+            val = FC_TS_l;
+            if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, TAB):
-            if(iter_ctor_add(tokens, FC_TT_l) == EXIT_FAILURE)
+            val = FC_TT_l;
+            if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, LF):
-            return iter_ctor_add(tokens, FC_TL);
+            val = FC_TL;
+            return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(LF, LF):
-            return iter_ctor_add(tokens, FC_LL);
+            val = FC_LL;
+            return dyn_array_push_back(tokens, &val);
         
         default:
             fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace Flow Control command: (ASCII: %u %u)\n", (unsigned char)c1, (unsigned char)c2);
@@ -196,12 +224,10 @@ int tokenize_flow_control(FILE *fptr, Iterator *tokens){
     }
 }
 
-int tokenize_whitespace(FILE *fptr, Iterator *tokens){
-    *tokens = (Iterator){.index = 0, .count = 0, .capacity = TOKENS_CAP, .elements = calloc(TOKENS_CAP, sizeof(size_t))};
-    if(!tokens->elements){
-        fprintf(stderr, "Failure allocating memory\n");
+int tokenize_whitespace(FILE *fptr, DynArray *tokens){
+    if(dyn_array_init(tokens, TOKENS_CAP, sizeof(size_t)) == EXIT_FAILURE)
         return EXIT_FAILURE;
-    }
+
     
     int imp_c1, imp_c2;
 
@@ -209,7 +235,7 @@ int tokenize_whitespace(FILE *fptr, Iterator *tokens){
         switch(imp_c1){
             case TAB:
                 if(read_ws_command_char(fptr, &imp_c2) == EXIT_FAILURE){
-                    free(tokens->elements);
+                    dyn_array_free(tokens);
                     return EXIT_FAILURE;
                 }
 
@@ -217,7 +243,7 @@ int tokenize_whitespace(FILE *fptr, Iterator *tokens){
                 switch(key){
                     case WS_KEY(TAB, LF):
                         if(tokenize_io(fptr, tokens) == EXIT_FAILURE){
-                            free(tokens->elements);
+                            dyn_array_free(tokens);
                             return EXIT_FAILURE;
                         }
 
@@ -225,7 +251,7 @@ int tokenize_whitespace(FILE *fptr, Iterator *tokens){
 
                     case WS_KEY(TAB, SPACE):
                         if(tokenize_arithmetic(fptr, tokens) == EXIT_FAILURE){
-                            free(tokens->elements);
+                            dyn_array_free(tokens);
                             return EXIT_FAILURE;
                         }
 
@@ -233,7 +259,7 @@ int tokenize_whitespace(FILE *fptr, Iterator *tokens){
 
                     case WS_KEY(TAB, TAB):
                         if(tokenize_heap(fptr, tokens) == EXIT_FAILURE){
-                            free(tokens->elements);
+                            dyn_array_free(tokens);
                             return EXIT_FAILURE;
                         }
 
@@ -241,21 +267,21 @@ int tokenize_whitespace(FILE *fptr, Iterator *tokens){
 
                     default:
                         fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IMP: (ASCII: %u %u)\n", (unsigned char)imp_c1, (unsigned char)imp_c2);
-                        free(tokens->elements);
+                        dyn_array_free(tokens);
                         return EXIT_FAILURE;
                 }
                 break;
 
             case SPACE:
                 if(tokenize_stack_manip(fptr, tokens) == EXIT_FAILURE){
-                    free(tokens->elements);
+                    dyn_array_free(tokens);
                     return EXIT_FAILURE;
                 }
                 break;
 
             case LF:
                 if(tokenize_flow_control(fptr, tokens) == EXIT_FAILURE){
-                    free(tokens->elements);
+                    dyn_array_free(tokens);
                     return EXIT_FAILURE;
                 }
                 break;

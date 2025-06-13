@@ -4,14 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "iterator.h"
-#include "stack.h"
+#include "dyn_array.h"
 
 int read_in_bf(unsigned char *);
 
 int read_ws_command_char(FILE *, unsigned int *);
 
-int tokenize_ws_raw(FILE *, Iterator *);
+int tokenize_ws_raw(FILE *, DynArray *);
 
 int read_in_char_ws(unsigned char *);
 

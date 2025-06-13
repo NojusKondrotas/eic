@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/io.h"
-#include "../include/stack.h"
+#include "../include/dyn_array.h"
 #include "../include/whitespace.h"
 #include "../include/lexer.h"
 
@@ -39,21 +39,25 @@ int read_ws_command_char(FILE *fptr, unsigned int *out_char){
     return EXIT_SUCCESS;
 }
 
-int tokenize_ws_raw(FILE *fptr, Iterator *iterator){
+int tokenize_ws_raw(FILE *fptr, DynArray *array){
     size_t c = fgetc(fptr);
+    size_t val;
     while(c != EOF){
         switch (c) {
             case SPACE:
-                if(iter_ctor_add(iterator, SPACE_RAW) == EXIT_FAILURE)
+                val = SPACE_RAW;
+                if(dyn_array_push_back(array, &val) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                 break;
 
             case TAB:
-                if (iter_ctor_add(iterator, TAB_RAW) == EXIT_FAILURE)
+                val = TAB_RAW;
+                if (dyn_array_push_back(array, &val) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                 break;
             case LF:
-                return iter_ctor_add(iterator, LF_RAW);
+                val = LF_RAW;
+                return dyn_array_push_back(array, &val);
         }
 
         c = fgetc(fptr);
