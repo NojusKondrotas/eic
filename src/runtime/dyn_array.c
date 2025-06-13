@@ -1,6 +1,7 @@
 #include "../include/dyn_array.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int dyn_array_init(DynArray* array, size_t cap, size_t element_size) {
     array->data = calloc(cap, element_size);
@@ -67,7 +68,7 @@ int dyn_array_set(DynArray* array, size_t index, const void* element) {
     if (index >= array->size) {
         return EXIT_FAILURE;
     }
-
+    
     memcpy((char*)array->data + index * array->element_size, element, array->element_size);
     return EXIT_SUCCESS;
 }

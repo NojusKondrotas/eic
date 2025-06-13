@@ -5,13 +5,12 @@
 #include "../include/dyn_array.h"
 #include "../include/whitespace.h"
 
-int parse_whitespace_number(DynArray *tokens, ptrdiff_t *number){
-    unsigned int c;
+int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
+    size_t c = *(size_t *)dyn_array_get(tokens, (*idx)++);
     int sign;
     *number = 0;
 
-    if(next(tokens_iter)){
-        c = tokens_iter->elements[tokens_iter->index++];
+    if(c != LF_RAW){
         switch(c){
             case SPACE_RAW:
                 sign = 1;
@@ -25,7 +24,8 @@ int parse_whitespace_number(DynArray *tokens, ptrdiff_t *number){
         }
     }
 
-    while(next(tokens_iter) && (c = tokens_iter->elements[tokens_iter->index++]) != EOF){
+    c = *(size_t *)dyn_array_get(tokens, (*idx)++);
+    while(c != LF_RAW){
         switch(c){
             case SPACE_RAW:
                 *number <<= 1;
@@ -34,12 +34,11 @@ int parse_whitespace_number(DynArray *tokens, ptrdiff_t *number){
                 *number <<= 1;
                 ++*number;
                 break;
-            case LF_RAW:
-                *number *= sign;
-                return EXIT_SUCCESS;
         }
+
+        c = *(size_t *)dyn_array_get(tokens, (*idx)++);
     }
-    
-    fprintf(stderr, "EOF encountered while parsing a number\n");
-    return EXIT_FAILURE;
+
+    *number *= sign;
+    return EXIT_SUCCESS;
 }

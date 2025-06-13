@@ -5,7 +5,7 @@
 #include "../../include/io.h"
 #include "../../include/dyn_array.h"
 
-int create_label(FILE *fptr, int instr_idx, DynArray *labels){
+int create_label(FILE *fptr, size_t instr_idx, DynArray *labels){
     Label label;
     label.instruction_index = instr_idx;
     if(dyn_array_init(&label.id, LABELS_CAP, sizeof(size_t)) == EXIT_FAILURE)

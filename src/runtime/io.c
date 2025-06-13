@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "../include/io.h"
 #include "../include/dyn_array.h"
 #include "../include/whitespace.h"
@@ -27,7 +28,7 @@ int read_in_bf(unsigned char *val){
     return EXIT_SUCCESS;
 }
 
-int read_ws_command_char(FILE *fptr, unsigned int *out_char){
+int read_ws_command_char(FILE *fptr, int *out_char){
     do {
         *out_char = fgetc(fptr);
         if (*out_char == EOF) {
@@ -40,7 +41,7 @@ int read_ws_command_char(FILE *fptr, unsigned int *out_char){
 }
 
 int tokenize_ws_raw(FILE *fptr, DynArray *array){
-    size_t c = fgetc(fptr);
+    ptrdiff_t c = fgetc(fptr);
     size_t val;
     while(c != EOF){
         switch (c) {

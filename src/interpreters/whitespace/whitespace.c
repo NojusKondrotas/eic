@@ -184,16 +184,17 @@ int execute_whitespace_file(FILE* fptr){
         return EXIT_FAILURE;
     }
 
-    size_t tokens_idx = 0;
-    unsigned int cmd;
+    size_t tokens_idx = 0, cmd;
     // Utility variables
     size_t heap_addr, new_cap;
     ptrdiff_t num, tmp;
     unsigned char ch;
 
     while(tokens_idx < tokens.size){
-        cmd = *(unsigned int *)dyn_array_get(&tokens, tokens_idx++);
-        printf("%X\n", cmd);
+        cmd = *(size_t *)dyn_array_get(&tokens, tokens_idx++);
+        // printf("%zX\n", cmd);
+        // printf("curr: %zu, size: %zu\n", tokens_idx, tokens.size);
+        
         switch(cmd){
             // Handle IO command
             case IO_TS:
@@ -267,7 +268,8 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
                 
-                ch = *(unsigned char *)dyn_array_get(&stack, --stack.size);
+                ch = *(unsigned char *)dyn_array_get(&stack, stack.size - 1);
+                --stack.size;
 
                 if(out_char_ws(ch) == EXIT_FAILURE)
                     return EXIT_FAILURE;
@@ -279,7 +281,8 @@ int execute_whitespace_file(FILE* fptr){
                     free_resources(&tokens, &stack, &heap, &labels);
                     return EXIT_FAILURE;
                 }
-                num = *(ptrdiff_t *)dyn_array_get(&stack, --stack.size);
+                num = *(ptrdiff_t *)dyn_array_get(&stack, stack.size - 1);
+                --stack.size;
 
                 if(out_number_ws(num) == EXIT_FAILURE)
                     return EXIT_FAILURE;
@@ -288,7 +291,7 @@ int execute_whitespace_file(FILE* fptr){
 
             // Handle Stack Manipulation command
             case SM_S_n:
-                if(parse_whitespace_number(&tokens, &num) == EXIT_FAILURE){
+                if(parse_whitespace_number(&tokens, &tokens_idx, &num) == EXIT_FAILURE){
                     free_resources(&tokens, &stack, &heap, &labels);
                     return EXIT_FAILURE;
                 }
@@ -334,12 +337,12 @@ int execute_whitespace_file(FILE* fptr){
                     
                 break;
             case SM_TS_n:
-                if(parse_whitespace_number(&tokens, &num) == EXIT_FAILURE){
+                if(parse_whitespace_number(&tokens, &tokens_idx, &num) == EXIT_FAILURE){
                     free_resources(&tokens, &stack, &heap, &labels);
                     return EXIT_FAILURE;
                 }
 
-                if(num >= stack.size){
+                if(num >= 0 && num >= stack.size){
                     fprintf(stderr, "Stack index out of bounds\n");
                     free_resources(&tokens, &stack, &heap, &labels);
                     return EXIT_FAILURE;
@@ -354,12 +357,12 @@ int execute_whitespace_file(FILE* fptr){
                     
                 break;
             case SM_TL_n:
-                if(parse_whitespace_number(&tokens, &num) == EXIT_FAILURE){
+                if(parse_whitespace_number(&tokens, &tokens_idx, &num) == EXIT_FAILURE){
                     free_resources(&tokens, &stack, &heap, &labels);
                     return EXIT_FAILURE;
                 }
 
-                if(num >= stack.size){
+                if(num >= 0 && num >= stack.size){
                     fprintf(stderr, "Given argument cannot be more than or equal to stack's item count when performing stack sliding\n");
                     free_resources(&tokens, &stack, &heap, &labels);
                     return EXIT_FAILURE;

@@ -8,7 +8,7 @@
 
 int read_in_bf(unsigned char *);
 
-int read_ws_command_char(FILE *, unsigned int *);
+int read_ws_command_char(FILE *, int *);
 
 int tokenize_ws_raw(FILE *, DynArray *);
 
