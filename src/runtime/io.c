@@ -72,6 +72,41 @@ int tokenize_ws_raw(FILE *fptr, DynArray *array){
     return EXIT_SUCCESS;
 }
 
+int get_ws_label(DynArray *tokens, size_t *idx, DynArray *label){
+    if(dyn_array_init(label, TOKENS_CAP, sizeof(size_t)) == EXIT_FAILURE){
+        return EXIT_FAILURE;
+    }
+    size_t c;
+
+    while(*idx < tokens->size){
+        c = *(size_t *)dyn_array_get(tokens, (*idx)++);
+
+        switch (c) {
+            case SPACE_RAW:
+            case TAB_RAW:
+                if(dyn_array_push_back(label, &c) == EXIT_FAILURE){
+                    dyn_array_free(label);
+                    return EXIT_FAILURE;
+                }
+                break;
+            case LF_RAW:
+                if(dyn_array_push_back(label, &c) == EXIT_FAILURE){
+                    dyn_array_free(label);
+                    return EXIT_FAILURE;
+                }
+                return EXIT_SUCCESS;
+            default:
+                fprintf(stderr, "Unexpected token encountered when reading label post-lexing\n");
+                dyn_array_free(label);
+                return EXIT_FAILURE;
+        }
+    }
+
+    fprintf(stderr, "Unexpected end of tokens while reading label\n");
+    dyn_array_free(label);
+    return EXIT_FAILURE;
+}
+
 int read_in_char_ws(unsigned char *ch){
     int tmp = fgetc(stdin);
     

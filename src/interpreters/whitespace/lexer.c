@@ -7,14 +7,21 @@
 
 int create_label(FILE *fptr, size_t instr_idx, DynArray *labels){
     Label label;
-    label.instruction_index = instr_idx;
+    label.instruction_index = instr_idx - 1;
     if(dyn_array_init(&label.id, LABELS_CAP, sizeof(size_t)) == EXIT_FAILURE)
         return EXIT_FAILURE;
-    
-    if(dyn_array_push_back(labels, &label) == EXIT_FAILURE)
-        return EXIT_FAILURE;
 
-    return tokenize_ws_raw(fptr, &label.id);
+    if (tokenize_ws_raw(fptr, &label.id) == EXIT_FAILURE) {
+        dyn_array_free(&label.id);
+        return EXIT_FAILURE;
+    }
+    
+    if(dyn_array_push_back(labels, &label) == EXIT_FAILURE){
+        dyn_array_free(&label.id);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
 
 int tokenize_io(FILE *fptr, DynArray *tokens){
@@ -199,28 +206,28 @@ int tokenize_flow_control(FILE *fptr, DynArray *tokens, DynArray *labels){
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            return create_label(fptr, tokens->size, labels);
+            return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(SPACE, LF):
             val = FC_SL_l;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            return create_label(fptr, tokens->size, labels);
+            return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, SPACE):
             val = FC_TS_l;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            return create_label(fptr, tokens->size, labels);
+            return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, TAB):
             val = FC_TT_l;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
-            return create_label(fptr, tokens->size, labels);
+            return tokenize_ws_raw(fptr, tokens);
 
         case WS_KEY(TAB, LF):
             val = FC_TL;

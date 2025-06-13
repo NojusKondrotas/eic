@@ -42,3 +42,13 @@ int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
     *number *= sign;
     return EXIT_SUCCESS;
 }
+
+int check_array_equality_size_t(size_t *left, size_t *right, size_t length){
+    for(size_t i = 0; i < length; ++i){
+        printf("first: %zX, second: %zX\n", left[i], right[i]);
+        if (left[i] != right[i])
+            return 0;
+    }
+
+    return 1;
+}
