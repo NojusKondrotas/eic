@@ -20,7 +20,7 @@ int dyn_array_init(DynArray* array, size_t cap, size_t element_size) {
 void dyn_array_free(DynArray* array) {
     if(array == NULL)
         return;
-        
+
     free(array->data);
     array->data = NULL;
     array->capacity = 0;
@@ -60,7 +60,7 @@ int dyn_array_pop_back(DynArray* array) {
 }
 
 void* dyn_array_get(DynArray* array, size_t index) {
-    if (index >= array->size || index < 0) {
+    if (index >= array->size) {
         return NULL;
     }
     
