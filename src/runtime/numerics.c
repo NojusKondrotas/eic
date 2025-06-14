@@ -52,3 +52,12 @@ int check_array_equality_size_t(size_t *left, size_t *right, size_t length){
 
     return 1;
 }
+
+int check_not_null_ptr(const void *ptr){
+    if(!ptr){
+        fprintf(stderr, "A null pointer encountered, cannot continue\n");
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}

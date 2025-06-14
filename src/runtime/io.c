@@ -156,16 +156,20 @@ int read_in_number_ws(ptrdiff_t *num){
     return EXIT_SUCCESS;
 }
 
-//TODO: add error handling
 int out_char_ws(unsigned char ch){
-    fprintf(stdout, "%c", ch);
+    if(fprintf(stdout, "%c", ch) < 0){
+        fprintf(stderr, "Error writing to stdout\n");
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
 
-//TODO: add error handling
 int out_number_ws(ptrdiff_t number){
-    fprintf(stdout, "%td", number);
+    if(fprintf(stdout, "%td", number) < 0){
+        fprintf(stderr, "Error writing to stdout\n");
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }

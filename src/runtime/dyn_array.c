@@ -18,7 +18,7 @@ int dyn_array_init(DynArray* array, size_t cap, size_t element_size) {
 }
 
 void dyn_array_free(DynArray* array) {
-    if(array == NULL)
+    if(!array)
         return;
 
     free(array->data);
@@ -60,6 +60,7 @@ void* dyn_array_get(DynArray* array, size_t index) {
 
 int dyn_array_set(DynArray* array, size_t index, const void* element) {
     if (index >= array->capacity) {
+        fprintf(stderr, "Index out of bounds\n");
         return EXIT_FAILURE;
     }
     
