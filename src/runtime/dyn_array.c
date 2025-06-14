@@ -51,7 +51,7 @@ int dyn_array_push_back(DynArray* array, const void* element) {
 }
 
 void* dyn_array_get(DynArray* array, size_t index) {
-    if (index >= array->size || index < 0) {
+    if (index >= array->capacity) {
         return NULL;
     }
     

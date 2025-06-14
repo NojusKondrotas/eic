@@ -127,13 +127,12 @@ int read_in_number_ws(ptrdiff_t *num){
     *num = 0;
     if(tmp == '-'){
         sign = -1;
-        tmp = fgetc(stdin);
     }
     else if(tmp == '+'){
         sign = 1;
-        tmp = fgetc(stdin);
     }
     else if(tmp > 47 && tmp < 58){
+        *num = tmp - '0';
         sign = 1;
     }
     else{
@@ -141,6 +140,7 @@ int read_in_number_ws(ptrdiff_t *num){
         return EXIT_FAILURE;
     }
     
+    tmp = fgetc(stdin);
     while(tmp > 47 && tmp < 58){
         *num *= 10;
         *num += tmp - '0';
@@ -151,8 +151,6 @@ int read_in_number_ws(ptrdiff_t *num){
             return EXIT_FAILURE;
         }
     }
-
-    while(fgetc(stdin) != LF);
 
     *num *= sign;
     return EXIT_SUCCESS;
