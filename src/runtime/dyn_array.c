@@ -50,17 +50,8 @@ int dyn_array_push_back(DynArray* array, const void* element) {
     return EXIT_SUCCESS;
 }
 
-int dyn_array_pop_back(DynArray* array) {
-    if (array->size == 0) {
-        return EXIT_FAILURE;
-    }
-
-    array->size--;
-    return EXIT_SUCCESS;
-}
-
 void* dyn_array_get(DynArray* array, size_t index) {
-    if (index >= array->size) {
+    if (index >= array->size || index < 0) {
         return NULL;
     }
     
@@ -68,7 +59,7 @@ void* dyn_array_get(DynArray* array, size_t index) {
 }
 
 int dyn_array_set(DynArray* array, size_t index, const void* element) {
-    if (index >= array->size) {
+    if (index >= array->capacity) {
         return EXIT_FAILURE;
     }
     
