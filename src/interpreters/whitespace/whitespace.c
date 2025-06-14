@@ -19,7 +19,7 @@ int match_ws_label(Label *label, DynArray *against_labels, size_t *matching_labe
     size_t idx = 0;
     while(idx < against_labels->size){
         Label *candidate = (Label *)dyn_array_get(against_labels, idx);
-        printf("label length: %zu, %zu\n", label->id.size, candidate->id.size);
+        // printf("label length: %zu, %zu\n", label->id.size, candidate->id.size);
 
         if(label->id.size != candidate->id.size){
             ++idx;
@@ -37,152 +37,20 @@ int match_ws_label(Label *label, DynArray *against_labels, size_t *matching_labe
     return 0;
 }
 
-// void print_stack(ssize_t *stack, size_t stack_top) {
-//     printf("Stack [");
-//     for (size_t i = 0; i < stack_top; ++i) {
-//         printf("%zd", stack[i]);
-//         if (i < stack_top - 1) printf(", ");
-//     }
-//     printf("]\n");
-// }
-
-// void handle_flow_control(FILE *fptr, ssize_t *stack, Label *labels){
-
-// }
-
-// int dup_stack(ssize_t **stack, size_t *stack_cap, size_t *stack_top){
-//     if(*stack_top == 0){
-//         fprintf(stderr, "Failure duplicating stack, no elements contained\n");
-//         return EXIT_FAILURE;
-//     }
-//     if(ensure_stack_cap(stack, stack_cap, stack_top) == EXIT_FAILURE){
-//         fprintf(stderr, "Failure allocating memory\n");
-//         return EXIT_FAILURE;
-//     }
-
-//     (*stack)[*stack_top] = (*stack)[*stack_top - 1];
-//     ++(*stack_top);
-
-//     return EXIT_SUCCESS;
-// }
-
-// int swap_stack(ssize_t **stack, size_t *stack_cap, size_t *stack_top){
-//     if(*stack_top < 2){
-//         fprintf(stderr, "Failure conducting stack swap: stack contains too few elements (%zu)\n", *stack_top);
-//         return EXIT_FAILURE;
-//     }
-
-//     --(*stack_top);
-//     ssize_t tmp = (*stack)[*stack_top - 1];
-//     (*stack)[*stack_top - 1] = (*stack)[*stack_top];
-//     (*stack)[*stack_top] = tmp;
-//     ++(*stack_top);
-
-//     return EXIT_SUCCESS;
-// }
-
-// int slide_stack(ssize_t **stack, size_t n, size_t *stack_cap, size_t *stack_top){
-//     if(n >= *stack_top){
-//         fprintf(stderr, "Failure sliding stack, too many elements to remove (%zu)", n);
-//         return EXIT_FAILURE;
-//     }
-
-//     size_t op_bottom = *stack_top - n - 1;
-//     (*stack)[op_bottom] = (*stack)[*stack_top - 1];
-
-//     (*stack_top) -= n;
-
-//     return EXIT_SUCCESS;
-// }
-
-// int handle_stack_manip(FILE *fptr, ssize_t **stack, size_t *stack_cap, size_t *stack_top){
-//     int c = fgetc(fptr);
-
-//     switch(c){
-//         case SPACE:
-//             ssize_t number = parse_whitespace_number(fptr);
-            
-//             if(push_to_stack(stack, number, stack_cap, stack_top) == EXIT_FAILURE)
-//                 return EXIT_FAILURE;
-
-//             break;
-//         case LF:
-//             c = fgetc(fptr);
-            
-//             switch (c)
-//             {
-//             case SPACE:
-//                 if(dup_stack(stack, stack_cap, stack_top) == EXIT_FAILURE)
-//                     return EXIT_FAILURE;
-                    
-//                 break;
-//             case TAB:
-//                 if(swap_stack(stack, stack_cap, stack_top) == EXIT_FAILURE)
-//                     return EXIT_FAILURE;
-
-//                 break;
-//             case LF:
-//                 if(stack_top == 0){
-//                     fprintf(stderr, "Failure conducting stack discard: stack contains zero elements\n");
-//                     return EXIT_FAILURE;
-//                 }
-
-//                 --(*stack_top);
-//                 break;
-//             default:
-//                 fprintf(stderr, "Unrecognised stack manipulation command\n");
-//                 return EXIT_FAILURE;
-//             }
-
-//             break;
-//         case TAB:
-//             c = fgetc(fptr);
-
-//             switch(c){
-//                 case SPACE:
-//                     ssize_t i = parse_whitespace_number(fptr);
-//                     if(i < 0 || i >= *stack_top){
-//                         fprintf(stderr, "Failure copying %zdnth element\n", i);
-//                         return EXIT_FAILURE;
-//                     }
-
-//                     if(ensure_stack_cap(stack, stack_cap, stack_top) == EXIT_FAILURE)
-//                         return EXIT_FAILURE;
-
-//                     (*stack)[(*stack_top)++] = (*stack)[i];
-//                     break;
-//                 case LF:
-//                     ssize_t n = parse_whitespace_number(fptr);
-//                     if(n < 0){
-//                         fprintf(stderr, "stack sliding amount can't be less than zero (%zd)\n", n);
-//                         return EXIT_FAILURE;
-//                     }
-
-//                     if(slide_stack(stack, n, stack_cap, stack_top) == EXIT_FAILURE)
-//                         return EXIT_FAILURE;
-                    
-//                     break;
-//                 default:
-//                     fprintf(stderr, "Unrecognised stack manipulation command\n");
-//                     return EXIT_FAILURE;
-//             }
-
-//             break;
-//         default:
-//             fprintf(stderr, "Unrecognised stack manipulation command\n");
-//             return EXIT_FAILURE;
-//     }
-
-//     return EXIT_SUCCESS;
-// }
-
-// void handle_io(ssize_t *stack, ssize_t *heap){
-
-// }
-
-// void handle_arithmetic(ssize_t *stack){
-
-// }
+int jump_to_label(DynArray *tokens, DynArray *labels, size_t *tokens_idx, size_t *idx, Label *tmp_label){
+    if(get_ws_label(tokens, tokens_idx, &tmp_label->id) == EXIT_FAILURE){
+        return EXIT_FAILURE;
+    }
+    
+    if(match_ws_label(tmp_label, labels, idx)){
+        *tokens_idx = ((Label *)dyn_array_get(labels, *idx))->instruction_index + 1;
+        return EXIT_SUCCESS;
+    }
+    else{
+        fprintf(stderr, "Found no matching label when attempting jump\n");
+        return EXIT_FAILURE;
+    }
+}
 
 int execute_whitespace_file(FILE* fptr){
     DynArray tokens;
@@ -217,7 +85,7 @@ int execute_whitespace_file(FILE* fptr){
 
     while(tokens_idx < tokens.size){
         cmd = *(size_t *)dyn_array_get(&tokens, tokens_idx++);
-        printf("%zX\n", cmd);
+        // printf("%zX\n", cmd);
         // printf("curr: %zu, size: %zu\n", tokens_idx, tokens.size);
         
         switch(cmd){
@@ -228,7 +96,8 @@ int execute_whitespace_file(FILE* fptr){
                     free_resources(&tokens, &stack, &heap, &labels, &call_stack);
                     return EXIT_FAILURE;
                 }
-                heap_addr = *(size_t *)dyn_array_get(&stack, --stack.size);
+                heap_addr = *(size_t *)dyn_array_get(&stack, stack.size - 1);
+                --stack.size;
 
                 if(read_in_char_ws(&ch) == EXIT_FAILURE){
                     free_resources(&tokens, &stack, &heap, &labels, &call_stack);
@@ -252,7 +121,6 @@ int execute_whitespace_file(FILE* fptr){
                     free_resources(&tokens, &stack, &heap, &labels, &call_stack);
                     return EXIT_FAILURE;
                 }
-                    
                 break;
             case IO_TT:
                 if(stack.size == 0){
@@ -260,7 +128,8 @@ int execute_whitespace_file(FILE* fptr){
                     free_resources(&tokens, &stack, &heap, &labels, &call_stack);
                     return EXIT_FAILURE;
                 }
-                heap_addr = *(size_t *)dyn_array_get(&stack, --stack.size);
+                heap_addr = *(size_t *)dyn_array_get(&stack, stack.size - 1);
+                --stack.size;
 
                 if(read_in_number_ws(&num) == EXIT_FAILURE){
                     free_resources(&tokens, &stack, &heap, &labels, &call_stack);
@@ -328,6 +197,11 @@ int execute_whitespace_file(FILE* fptr){
                     
                 break;
             case SM_LS:
+                if(stack.size == 0){
+                    fprintf(stderr, "Stack size cannot be 0 when duplicating the top item\n");
+                    free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+                    return EXIT_FAILURE;
+                }
                 if(dyn_array_push_back(&stack, dyn_array_get(&stack, stack.size - 1)) == EXIT_FAILURE){
                     free_resources(&tokens, &stack, &heap, &labels, &call_stack);
                     return EXIT_FAILURE;
@@ -494,47 +368,70 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(get_ws_label(&tokens, &tokens_idx, &tmp_label.id) == EXIT_FAILURE){
-                    free_resources(&tokens, &stack, &heap, &labels, &call_stack);
-                    return EXIT_FAILURE;
-                }
-                
-                if(match_ws_label(&tmp_label, &labels, &idx)){
-                    tokens_idx = ((Label *)dyn_array_get(&labels, idx))->instruction_index + 1;
-                    break;
-                }
-                else{
-                    fprintf(stderr, "Found no matching label when calling a subroutine\n");
+                if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
                     free_resources(&tokens, &stack, &heap, &labels, &call_stack);
                     return EXIT_FAILURE;
                 }
                     
                 break;
             case FC_SL_l:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
+                    free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+                    return EXIT_FAILURE;
+                }
                     
                 break;
             case FC_TS_l:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                num = *(ptrdiff_t *)dyn_array_get(&stack, stack.size - 1);
+                
+                if(num == 0){
+                    if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
+                        free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+                        return EXIT_FAILURE;
+                    }
+                }
+                else{
+                    if(get_ws_label(&tokens, &tokens_idx, &tmp_label.id) == EXIT_FAILURE){
+                        free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+                        return EXIT_FAILURE;
+                    }
+                }
                     
                 break;
             case FC_TT_l:
-                //if(handle == exit_failure)
-                    //return exit_failure;
+                num = *(ptrdiff_t *)dyn_array_get(&stack, stack.size - 1);
+                    
+                if(num < 0){
+                    if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
+                        free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+                        return EXIT_FAILURE;
+                    }
+                }
+                else{
+                    if(get_ws_label(&tokens, &tokens_idx, &tmp_label.id) == EXIT_FAILURE){
+                        free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+                        return EXIT_FAILURE;
+                    }
+                }
                     
                 break;
             case FC_TL:
-                //if(handle == exit_failure)
-                    //return exit_failure;
-                    
+                if(call_stack.size > 0)
+                    idx = *(size_t *)dyn_array_get(&call_stack, call_stack.size - 1);
+                else{
+                    fprintf(stderr, "Call stack cannot be empty when ending a subroutine\n");
+                    free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+                    return EXIT_FAILURE;
+                }
+
+                --call_stack.size;
+                tokens_idx = idx;
+
                 break;
             case FC_LL:
-                //if(handle == exit_failure)
-                    //return exit_failure;
-                    
-                break;
+                free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+
+                return EXIT_SUCCESS;
 
             // Handle Heap command
             case HP_S:
@@ -574,7 +471,8 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                heap_addr = *(size_t *)dyn_array_get(&stack, --stack.size);
+                heap_addr = *(size_t *)dyn_array_get(&stack, stack.size - 1);
+                --stack.size;
                 if(heap_addr >= heap.capacity){
                     new_cap = heap.capacity * 2;
                     while(new_cap <= heap_addr)
@@ -598,8 +496,9 @@ int execute_whitespace_file(FILE* fptr){
                 break;
             
             default:
-                //handle
-                break;
+                fprintf(stderr, "Encountered unexpected token during execution\n");
+                free_resources(&tokens, &stack, &heap, &labels, &call_stack);
+                return EXIT_FAILURE;
         }
     }
 
