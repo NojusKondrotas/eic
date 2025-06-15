@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "../include/lexer.h"
+#include "../include/whitespace_lexer.h"
 #include "../include/dyn_array.h"
 #include "../include/whitespace.h"
 

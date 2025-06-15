@@ -4,7 +4,7 @@
 #include "../include/io.h"
 #include "../include/dyn_array.h"
 #include "../include/whitespace.h"
-#include "../include/lexer.h"
+#include "../include/whitespace_lexer.h"
 
 int read_in_bf(unsigned char *val){
     char in_data[4] = {0};

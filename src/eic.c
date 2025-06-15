@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "include/eic.h"
+#include "include/befunge93.h"
 #include "include/brainfuck.h"
+#include "include/funge98.h"
 #include "include/whitespace.h"
 
 int main(int argc, char *argv[]){
@@ -16,15 +18,25 @@ int main(int argc, char *argv[]){
         return EXIT_FAILURE;
     }
 
-    unsigned long hash_result = hash_string(extension);
+    size_t hash_result = hash_string(extension);
     
     switch (hash_result)
     {
     case BF:
-        case B:
-            return execute_bf(argv[1]);
+        //TO-DO: request additional confirmation concerning confusion between the execution of Brainfuck or Befunge-93
+        break;
+    case B:
+        return execute_bf(argv[1]);
     case WS:
         return execute_whitespace(argv[1]);
+    case BE:
+        case B93:
+            case BEFUNGE:
+                return execute_befunge93(argv[1]);
+    case B98:
+        case TF:
+            case UF:
+                return execute_funge98(argv[1]);
     default:
         fprintf(stderr, "Unsupported file extension: %s\n", extension);
         return EXIT_FAILURE;
@@ -44,7 +56,7 @@ char *get_extension(char *str){
     return extension;
 }
 
-unsigned long hash_string(char *str){
+size_t hash_string(char *str){
     unsigned long hash = 5381;
     int c;
 

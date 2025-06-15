@@ -5,7 +5,7 @@
 #include "../../include/whitespace.h"
 #include "../../include/numerics.h"
 #include "../../include/dyn_array.h"
-#include "../../include/lexer.h"
+#include "../../include/whitespace_lexer.h"
 
 void free_execution_resources(DynArray *tokens, DynArray *stack, DynArray *heap, DynArray *labels, DynArray *call_stack, DynArray *tmp_label_array){
     dyn_array_free(tokens);
