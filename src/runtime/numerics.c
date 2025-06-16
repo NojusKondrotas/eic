@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include "../include/numerics.h"
 #include "../include/whitespace_lexer.h"
 #include "../include/dyn_array.h"
 #include "../include/whitespace.h"
@@ -43,21 +44,21 @@ int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
     return EXIT_SUCCESS;
 }
 
-int check_array_equality_size_t(size_t *left, size_t *right, size_t length){
+bool check_array_equality_size_t(size_t *left, size_t *right, size_t length){
     for(size_t i = 0; i < length; ++i){
         // printf("first: %zX, second: %zX\n", left[i], right[i]);
         if (left[i] != right[i])
-            return 0;
+            return false;
     }
 
-    return 1;
+    return true;
 }
 
-int check_not_null_ptr(const void *ptr){
+bool check_if_null_ptr(const void *ptr){
     if(!ptr){
         fprintf(stderr, "A null pointer encountered, cannot continue\n");
-        return EXIT_FAILURE;
+        return true;
     }
 
-    return EXIT_SUCCESS;
+    return false;
 }

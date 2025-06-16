@@ -16,12 +16,12 @@ void free_execution_resources(DynArray *tokens, DynArray *stack, DynArray *heap,
     dyn_array_free(tmp_label_array);
 }
 
-int match_ws_label(Label *label, DynArray *against_labels, size_t *matching_label_idx){
+bool match_ws_label(Label *label, DynArray *against_labels, size_t *matching_label_idx){
     size_t idx = 0;
     while(idx < against_labels->size){
         Label *candidate = (Label *)dyn_array_get(against_labels, idx);
-        if(check_not_null_ptr(candidate) == EXIT_FAILURE)
-            return 0;
+        if(check_if_null_ptr(candidate))
+            return false;
         // printf("label length: %zu, %zu\n", label->id.size, candidate->id.size);
 
         if(label->id.size != candidate->id.size){
@@ -31,13 +31,13 @@ int match_ws_label(Label *label, DynArray *against_labels, size_t *matching_labe
         
         if(check_array_equality_size_t((size_t *)label->id.data, (size_t *)candidate->id.data, label->id.size)){
             *matching_label_idx = idx;
-            return 1;
+            return true;
         }
 
         ++idx;
     }
     
-    return 0;
+    return false;
 }
 
 int jump_to_label(DynArray *tokens, DynArray *labels, size_t *tokens_idx, size_t *idx, Label *tmp_label){
@@ -47,7 +47,7 @@ int jump_to_label(DynArray *tokens, DynArray *labels, size_t *tokens_idx, size_t
     
     if(match_ws_label(tmp_label, labels, idx)){
         Label *tmp = (Label *)dyn_array_get(labels, *idx);
-        if(check_not_null_ptr(tmp) == EXIT_FAILURE)
+        if(check_if_null_ptr(tmp))
             return EXIT_FAILURE;
         *tokens_idx = tmp->instruction_index + 1;
         return EXIT_SUCCESS;
@@ -99,7 +99,7 @@ int execute_whitespace_file(FILE* fptr){
 
     while(tokens_idx < tokens.size){
         ptr1 = dyn_array_get(&tokens, tokens_idx++);
-        if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+        if(check_if_null_ptr(ptr1)){
             free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
             return EXIT_FAILURE;
         }
@@ -117,7 +117,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -155,7 +155,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -194,7 +194,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
                 
                 ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -213,7 +213,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -246,7 +246,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -264,12 +264,12 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                 ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr2) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr2)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -309,7 +309,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 1 - num);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -346,12 +346,12 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                 ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr2) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr2)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -373,12 +373,12 @@ int execute_whitespace_file(FILE* fptr){
                 }
                 
                 ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                 ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr2) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr2)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -400,12 +400,12 @@ int execute_whitespace_file(FILE* fptr){
                 }
                 
                 ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                 ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr2) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr2)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -427,12 +427,12 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                 ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr2) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr2)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -460,12 +460,12 @@ int execute_whitespace_file(FILE* fptr){
                 }
                 
                 ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                 ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr2) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr2)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -509,7 +509,7 @@ int execute_whitespace_file(FILE* fptr){
                 break;
             case FC_TS_l:
                 ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -531,7 +531,7 @@ int execute_whitespace_file(FILE* fptr){
                 break;
             case FC_TT_l:
                 ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -554,7 +554,7 @@ int execute_whitespace_file(FILE* fptr){
             case FC_TL:
                 if(call_stack.size > 0){
                     ptr1 = dyn_array_get(&call_stack, call_stack.size - 1);
-                    if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                    if(check_if_null_ptr(ptr1)){
                         free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                         return EXIT_FAILURE;
                     }
@@ -584,12 +584,12 @@ int execute_whitespace_file(FILE* fptr){
                 }
                 
                 ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                 ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr2) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr2)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -625,7 +625,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_not_null_ptr(ptr1) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr1)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -646,7 +646,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 ptr2 = dyn_array_get(&heap, heap_addr);
-                if(check_not_null_ptr(ptr2) == EXIT_FAILURE){
+                if(check_if_null_ptr(ptr2)){
                     free_execution_resources(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
