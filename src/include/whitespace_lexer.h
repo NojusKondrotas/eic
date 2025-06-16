@@ -1,8 +1,12 @@
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef WHITESPACE_LEXER_H
+#define WHITESPACE_LEXER_H
 
 #include <stdio.h>
 #include "dyn_array.h"
+
+#define SPACE 32
+#define TAB 9
+#define LF 10
 
 #define TOKENS_CAP 20
 

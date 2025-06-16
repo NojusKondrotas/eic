@@ -4,18 +4,6 @@
 #include "../../include/brainfuck.h"
 #include "../../include/io.h"
 
-
-typedef enum{
-    OP_INC_PC = '>',
-    OP_DEC_PC = '<',
-    OP_INC_VAL = '+',
-    OP_DEC_VAL = '-',
-    OP_IN = ',',
-    OP_OUT = '.',
-    OP_JMP_FWD = '[',
-    OP_JMP_BCK = ']'
-}OP;
-
 int execute_bf_file(FILE *fptr){
     unsigned char *memory_tape = (unsigned char *)calloc(TAPE_LENGTH, sizeof(unsigned char));
     if(!memory_tape){
