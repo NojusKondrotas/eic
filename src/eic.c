@@ -30,13 +30,13 @@ int main(int argc, char *argv[]){
     case WS:
         return execute_whitespace(argv[1]);
     case BE:
-        case B93:
-            case BEFUNGE:
-                return execute_befunge93(argv[1]);
+    case B93:
+    case BEFUNGE:
+        return execute_befunge93(argv[1]);
     case B98:
-        case TF:
-            case UF:
-                return execute_funge98(argv[1]);
+    case TF:
+    case UF:
+        return execute_funge98(argv[1]);
     default:
         fprintf(stderr, "Unsupported file extension: %s\n", extension);
         return EXIT_FAILURE;
