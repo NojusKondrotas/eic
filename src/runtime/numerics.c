@@ -64,16 +64,7 @@ bool check_array_equality_size_t(size_t *left, size_t *right, size_t length){
     return true;
 }
 
-bool check_if_null_ptr(const void *ptr){
-    if(!ptr){
-        fprintf(stderr, "A null pointer encountered, cannot continue\n");
-        return true;
-    }
-
-    return false;
-}
-
-int perform_arithmetic_on_top(DynArray *array, bool is_signed, unsigned char op){
+int stack_arithmetic_top(DynArray *array, bool is_signed, unsigned char op){
     ptrdiff_t operand_left_signed, operand_right_signed;
     size_t operand_left_unsigned, operand_right_unsigned;
     
@@ -150,4 +141,34 @@ int perform_arithmetic_on_top(DynArray *array, bool is_signed, unsigned char op)
     }
 
     return EXIT_SUCCESS;
+}
+
+int stack_duplicate_element(DynArray *stack, size_t index){
+    void *tmp = NULL;
+    if(stack->size == 0){
+        fprintf(stderr, "Stack size cannot be 0 when duplicating its %zunth item\n", index);
+        return EXIT_FAILURE;
+    }
+
+    if(dyn_array_get(stack, index, tmp) == EXIT_FAILURE){
+        return EXIT_FAILURE;
+    }
+    return dyn_array_push_back(stack, tmp);
+}
+
+int stack_swap_top(DynArray *stack){
+    void *first_pop = NULL, *second_pop = NULL;
+    if(stack->size < 2){
+        fprintf(stderr, "Stack cannot have less than two items when performing a swap of its top items\n");
+        return EXIT_FAILURE;
+    }
+
+    if(dyn_array_pop_back(stack, first_pop) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+    if(dyn_array_pop_back(stack, second_pop) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+
+    if(dyn_array_push_back(stack, first_pop) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+    return dyn_array_push_back(stack, second_pop);
 }

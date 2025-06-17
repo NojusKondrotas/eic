@@ -224,44 +224,14 @@ int execute_whitespace_file(FILE* fptr){
                 
                 break;
             case SM_LS:
-                if(stack.size == 0){
-                    fprintf(stderr, "Stack size cannot be 0 when duplicating the top item\n");
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-
-                if(dyn_array_get(&stack, stack.size - 1, &tmp) == EXIT_FAILURE){
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-                if(dyn_array_push_back(&stack, &tmp) == EXIT_FAILURE){
+                if(stack_duplicate_element(&stack, stack.size - 1) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                  
                 break;
             case SM_LT:
-                if(stack.size < 2){
-                    fprintf(stderr, "Stack cannot have less than two items when performing a swap of its top items\n");
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-
-                if(dyn_array_pop_back(&stack, &num) == EXIT_FAILURE){
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-                if(dyn_array_pop_back(&stack, &tmp) == EXIT_FAILURE){
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-
-                if(dyn_array_push_back(&stack, &num) == EXIT_FAILURE){
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-
-                if(dyn_array_push_back(&stack, &tmp) == EXIT_FAILURE){
+                if(stack_swap_top(&stack) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -288,12 +258,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(dyn_array_get(&stack, stack.size - 1 - num, &tmp) == EXIT_FAILURE){
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-                
-                if(dyn_array_push_back(&stack, &tmp) == EXIT_FAILURE){
+                if(stack_duplicate_element(&stack, stack.size - 1 - num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -317,35 +282,35 @@ int execute_whitespace_file(FILE* fptr){
 
             // Handle Arithmetic command
             case AR_SS:
-                if(perform_arithmetic_on_top(&stack, true, '+') == EXIT_FAILURE){
+                if(stack_arithmetic_top(&stack, true, '+') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
             case AR_ST:
-                if(perform_arithmetic_on_top(&stack, true, '-') == EXIT_FAILURE){
+                if(stack_arithmetic_top(&stack, true, '-') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
             case AR_SL:
-                if(perform_arithmetic_on_top(&stack, true, '*') == EXIT_FAILURE){
+                if(stack_arithmetic_top(&stack, true, '*') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
             case AR_TS:
-                if(perform_arithmetic_on_top(&stack, true, '/') == EXIT_FAILURE){
+                if(stack_arithmetic_top(&stack, true, '/') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
             case AR_TT:
-                if(perform_arithmetic_on_top(&stack, true, '%') == EXIT_FAILURE){
+                if(stack_arithmetic_top(&stack, true, '%') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }

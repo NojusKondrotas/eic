@@ -11,8 +11,10 @@ int parse_whitespace_number(DynArray *, size_t *, ptrdiff_t *);
 
 bool check_array_equality_size_t(size_t *, size_t *, size_t);
 
-bool check_if_null_ptr(const void *);
+int stack_arithmetic_top(DynArray *array, bool is_signed, unsigned char op);
 
-int perform_arithmetic_on_top(DynArray *array, bool is_signed, unsigned char op);
+int stack_duplicate_element(DynArray *stack, size_t index);
+
+int stack_swap_top(DynArray *stack);
 
 #endif
