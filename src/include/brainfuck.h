@@ -1,6 +1,8 @@
 #ifndef BRAINFUCK_H
 #define BRAINFUCK_H
 
+#include <stdio.h>
+
 #define TAPE_LENGTH 30000
 
 typedef enum{
@@ -14,6 +16,8 @@ typedef enum{
     OP_JMP_BCK = ']'
 }OP;
 
-int execute_bf(char *);
+int execute_brainfuck_file(FILE *fptr);
+
+int execute_brainfuck(char *file_name);
 
 #endif

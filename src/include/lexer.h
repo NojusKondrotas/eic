@@ -1,6 +1,8 @@
 #ifndef BEFUNGE93_LEXER_H
 #define BEFUNGE93_LEXER_H
 
+#include <stdio.h>
+
 #define LF 10
 #define SPACE 32
 

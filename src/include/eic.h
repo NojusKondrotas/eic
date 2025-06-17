@@ -14,9 +14,9 @@
 #define TF 5863839 // Funge-98
 #define UF 5863872 // Funge-98
 
-char *get_extension(char *);
+char *get_extension(char *str);
 
-unsigned long hash_string(char *);
+size_t hash_string(char *str);
 
 int main(int argc, char *argv[]);
 

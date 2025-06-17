@@ -16,7 +16,7 @@ void free_execution_resources_whitespace(DynArray *tokens, DynArray *stack, DynA
     dyn_array_free(tmp_label_array);
 }
 
-bool match_ws_label(Label *label, DynArray *against_labels, size_t *matching_label_idx){
+bool match_whitespace_label(Label *label, DynArray *against_labels, size_t *matching_label_idx){
     size_t idx = 0;
     while(idx < against_labels->size){
         Label candidate;
@@ -40,12 +40,12 @@ bool match_ws_label(Label *label, DynArray *against_labels, size_t *matching_lab
     return false;
 }
 
-int jump_to_label(DynArray *tokens, DynArray *labels, size_t *tokens_idx, size_t *idx, Label *tmp_label){
-    if(get_ws_label(tokens, tokens_idx, &tmp_label->id) == EXIT_FAILURE){
+int jump_to_whitespace_label(DynArray *tokens, DynArray *labels, size_t *tokens_idx, size_t *idx, Label *tmp_label){
+    if(get_whitespace_label(tokens, tokens_idx, &tmp_label->id) == EXIT_FAILURE){
         return EXIT_FAILURE;
     }
     
-    if(match_ws_label(tmp_label, labels, idx)){
+    if(match_whitespace_label(tmp_label, labels, idx)){
         Label tmp;
         if(dyn_array_get(labels, *idx, &tmp) == EXIT_FAILURE)
             return EXIT_FAILURE;
@@ -118,7 +118,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(read_in_char_ws(&ch) == EXIT_FAILURE){
+                if(in_char_whitespace(&ch) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -153,7 +153,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(read_in_number_ws(&num) == EXIT_FAILURE){
+                if(in_number_whitespace(&num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -189,7 +189,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(out_char_ws(ch) == EXIT_FAILURE)
+                if(out_char_whitespace(ch) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                     
                 break;
@@ -205,7 +205,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(out_number_ws(num) == EXIT_FAILURE)
+                if(out_number_whitespace(num) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                     
                 break;
@@ -326,14 +326,14 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
+                if(jump_to_whitespace_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
             case FC_SL_l:
-                if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
+                if(jump_to_whitespace_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -346,13 +346,13 @@ int execute_whitespace_file(FILE* fptr){
                 }
                 
                 if(num == 0){
-                    if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
+                    if(jump_to_whitespace_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
                         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                         return EXIT_FAILURE;
                     }
                 }
                 else{
-                    if(get_ws_label(&tokens, &tokens_idx, &tmp_label.id) == EXIT_FAILURE){
+                    if(get_whitespace_label(&tokens, &tokens_idx, &tmp_label.id) == EXIT_FAILURE){
                         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                         return EXIT_FAILURE;
                     }
@@ -366,13 +366,13 @@ int execute_whitespace_file(FILE* fptr){
                 }
                     
                 if(num < 0){
-                    if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
+                    if(jump_to_whitespace_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
                         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                         return EXIT_FAILURE;
                     }
                 }
                 else{
-                    if(get_ws_label(&tokens, &tokens_idx, &tmp_label.id) == EXIT_FAILURE){
+                    if(get_whitespace_label(&tokens, &tokens_idx, &tmp_label.id) == EXIT_FAILURE){
                         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                         return EXIT_FAILURE;
                     }

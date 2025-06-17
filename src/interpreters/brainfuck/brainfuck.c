@@ -4,7 +4,7 @@
 #include "../../include/brainfuck.h"
 #include "../../include/io.h"
 
-int execute_bf_file(FILE *fptr){
+int execute_brainfuck_file(FILE *fptr){
     unsigned char *memory_tape = (unsigned char *)calloc(TAPE_LENGTH, sizeof(unsigned char));
     if(!memory_tape){
         fprintf(stderr, "Failure allocating memory\n");
@@ -49,7 +49,7 @@ int execute_bf_file(FILE *fptr){
                 break;
             case OP_IN:
                 unsigned char val;
-                read_in_bf(&val);
+                in_brainfuck(&val);
                 memory_tape[memc] = val;
                 break;
             case OP_OUT:
@@ -90,7 +90,7 @@ int execute_bf_file(FILE *fptr){
     return EXIT_SUCCESS;
 }
 
-int execute_bf(char *file_name){
+int execute_brainfuck(char *file_name){
     FILE *fptr;
 
     if((fptr = fopen(file_name, "r")) == NULL){
@@ -98,7 +98,7 @@ int execute_bf(char *file_name){
         return EXIT_FAILURE;
     }
 
-    int status = execute_bf_file(fptr);
+    int status = execute_brainfuck_file(fptr);
 
     fclose(fptr);
 

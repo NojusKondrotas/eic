@@ -2,14 +2,15 @@
 #define NUMERICS_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include "dyn_array.h"
 
 typedef enum{ false, true } bool;
 
-int parse_whitespace_number(DynArray *, size_t *, ptrdiff_t *);
+int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number);
 
-bool check_array_equality_size_t(size_t *, size_t *, size_t);
+bool check_array_equality_size_t(size_t *left, size_t *right, size_t length);
 
 int stack_arithmetic_top(DynArray *array, bool is_signed, unsigned char op);
 

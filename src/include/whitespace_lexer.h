@@ -2,13 +2,14 @@
 #define WHITESPACE_LEXER_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "dyn_array.h"
 
 #define SPACE 32
 #define TAB 9
 #define LF 10
 
-#define TOKENS_CAP 20
+#define TOKENS_CAP 32
 
 #define IO_TS 0x00 //Pop a heap address from the stack, read a character as ASCII, and store that character to that heap address
 #define IO_TT 0x01 //Pop a heap address from the stack, read a number, and store that number to that heap address
@@ -46,6 +47,18 @@
 
 #define WS_KEY(a, b) (((unsigned char)(a) << 8) | (unsigned char)(b))
 
-int tokenize_whitespace(FILE *, DynArray *, DynArray *);
+int create_whitespace_label(FILE *fptr, size_t instr_idx, DynArray *labels);
+
+int tokenize_io(FILE *fptr, DynArray *tokens);
+
+int tokenize_arithmetic(FILE *fptr, DynArray *tokens);
+
+int tokenize_heap(FILE *fptr, DynArray *tokens);
+
+int tokenize_stack_manip(FILE *fptr, DynArray *tokens);
+
+int tokenize_flow_control(FILE *fptr, DynArray *tokens, DynArray *labels);
+
+int tokenize_whitespace(FILE *fptr, DynArray *tokens, DynArray *labels);
 
 #endif

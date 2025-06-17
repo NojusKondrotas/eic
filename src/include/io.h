@@ -6,20 +6,20 @@
 #include <stddef.h>
 #include "dyn_array.h"
 
-int read_in_bf(unsigned char *);
+int in_brainfuck(unsigned char *val);
 
-int read_ws_command_char(FILE *, int *);
+int read_whitespace_command_char(FILE *fptr, int *out_char);
 
-int tokenize_ws_raw(FILE *, DynArray *);
+int tokenize_whitespace_raw(FILE *fptr, DynArray *array);
 
-int get_ws_label(DynArray *, size_t *, DynArray *);
+int get_whitespace_label(DynArray *tokens, size_t *idx, DynArray *label);
 
-int read_in_char_ws(unsigned char *);
+int in_char_whitespace(unsigned char *ch);
 
-int read_in_number_ws(ptrdiff_t *);
+int in_number_whitespace(ptrdiff_t *num);
 
-int out_char_ws(unsigned char);
+int out_char_whitespace(unsigned char ch);
 
-int out_number_ws(ptrdiff_t);
+int out_number_whitespace(ptrdiff_t number);
 
 #endif

@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
         //TO-DO: request additional confirmation concerning confusion between the execution of Brainfuck or Befunge-93
         break;
     case B:
-        return execute_bf(argv[1]);
+        return execute_brainfuck(argv[1]);
     case WS:
         return execute_whitespace(argv[1]);
     case BE:
@@ -57,7 +57,7 @@ char *get_extension(char *str){
 }
 
 size_t hash_string(char *str){
-    unsigned long hash = 5381;
+    size_t hash = 5381;
     int c;
 
     while((c = *str++))

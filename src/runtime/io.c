@@ -6,7 +6,7 @@
 #include "../include/whitespace.h"
 #include "../include/whitespace_lexer.h"
 
-int read_in_bf(unsigned char *val){
+int in_brainfuck(unsigned char *val){
     char in_data[4] = {0};
     *val = 0;
     if(fscanf(stdin, "%3s", in_data) != 1){
@@ -28,7 +28,7 @@ int read_in_bf(unsigned char *val){
     return EXIT_SUCCESS;
 }
 
-int read_ws_command_char(FILE *fptr, int *out_char){
+int read_whitespace_command_char(FILE *fptr, int *out_char){
     do {
         *out_char = fgetc(fptr);
         if (*out_char == EOF) {
@@ -40,7 +40,7 @@ int read_ws_command_char(FILE *fptr, int *out_char){
     return EXIT_SUCCESS;
 }
 
-int tokenize_ws_raw(FILE *fptr, DynArray *array){
+int tokenize_whitespace_raw(FILE *fptr, DynArray *array){
     ptrdiff_t c = fgetc(fptr);
     size_t val;
     while(c != EOF){
@@ -72,31 +72,27 @@ int tokenize_ws_raw(FILE *fptr, DynArray *array){
     return EXIT_SUCCESS;
 }
 
-int get_ws_label(DynArray *tokens, size_t *idx, DynArray *label){
+int get_whitespace_label(DynArray *tokens, size_t *idx, DynArray *label){
     if(dyn_array_init(label, TOKENS_CAP, sizeof(size_t)) == EXIT_FAILURE){
         return EXIT_FAILURE;
     }
     size_t c;
 
     while(*idx < tokens->size){
-        if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE){
-            dyn_array_free(label);
+        if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE)
             return EXIT_FAILURE;
-        }
 
         switch (c) {
             case SPACE_RAW:
             case TAB_RAW:
-                if(dyn_array_push_back(label, &c) == EXIT_FAILURE){
-                    dyn_array_free(label);
+                if(dyn_array_push_back(label, &c) == EXIT_FAILURE)
                     return EXIT_FAILURE;
-                }
+                    
                 break;
             case LF_RAW:
-                if(dyn_array_push_back(label, &c) == EXIT_FAILURE){
-                    dyn_array_free(label);
+                if(dyn_array_push_back(label, &c) == EXIT_FAILURE)
                     return EXIT_FAILURE;
-                }
+                
                 return EXIT_SUCCESS;
             default:
                 fprintf(stderr, "Unexpected token encountered when reading label post-lexing\n");
@@ -106,11 +102,10 @@ int get_ws_label(DynArray *tokens, size_t *idx, DynArray *label){
     }
 
     fprintf(stderr, "Unexpected end of tokens while reading label\n");
-    dyn_array_free(label);
     return EXIT_FAILURE;
 }
 
-int read_in_char_ws(unsigned char *ch){
+int in_char_whitespace(unsigned char *ch){
     int tmp = fgetc(stdin);
     
     if(tmp == EOF){
@@ -125,7 +120,7 @@ int read_in_char_ws(unsigned char *ch){
     return EXIT_SUCCESS;
 }
 
-int read_in_number_ws(ptrdiff_t *num){
+int in_number_whitespace(ptrdiff_t *num){
     int sign, tmp = fgetc(stdin);
     *num = 0;
     if(tmp == '-'){
@@ -159,7 +154,7 @@ int read_in_number_ws(ptrdiff_t *num){
     return EXIT_SUCCESS;
 }
 
-int out_char_ws(unsigned char ch){
+int out_char_whitespace(unsigned char ch){
     if(fprintf(stdout, "%c", ch) < 0){
         fprintf(stderr, "Error writing to stdout\n");
         return EXIT_FAILURE;
@@ -168,7 +163,7 @@ int out_char_ws(unsigned char ch){
     return EXIT_SUCCESS;
 }
 
-int out_number_ws(ptrdiff_t number){
+int out_number_whitespace(ptrdiff_t number){
     if(fprintf(stdout, "%td", number) < 0){
         fprintf(stderr, "Error writing to stdout\n");
         return EXIT_FAILURE;
