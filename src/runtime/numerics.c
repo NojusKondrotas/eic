@@ -7,11 +7,13 @@
 #include "../include/whitespace.h"
 
 int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
-    size_t c = *(size_t *)dyn_array_get(tokens, (*idx)++);
-    int sign;
+    size_t c;
+    int sign = 0;
     *number = 0;
 
-    if(c != LF_RAW){
+    if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+    while(c != LF_RAW && !sign){
         switch(c){
             case SPACE_RAW:
                 sign = 1;
@@ -20,12 +22,19 @@ int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
                 sign = -1;
                 break;
             default:
-                fprintf(stderr, "Unrecognised stack manipulation command\n");
-                return EXIT_FAILURE;
+                if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE)
+                    return EXIT_FAILURE;
+                break;
         }
     }
 
-    c = *(size_t *)dyn_array_get(tokens, (*idx)++);
+    if(!sign){
+        fprintf(stderr, "Unexpected LF encountered while parsing Whitespace number's sign\n");
+        return EXIT_FAILURE;
+    }
+
+    if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE)
+        return EXIT_FAILURE;
     while(c != LF_RAW){
         switch(c){
             case SPACE_RAW:
@@ -37,7 +46,8 @@ int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
                 break;
         }
 
-        c = *(size_t *)dyn_array_get(tokens, (*idx)++);
+        if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE)
+            return EXIT_FAILURE;
     }
 
     *number *= sign;
@@ -64,81 +74,79 @@ bool check_if_null_ptr(const void *ptr){
 }
 
 int perform_arithmetic_on_top(DynArray *array, bool is_signed, unsigned char op){
-    ptrdiff_t num_signed;
-    size_t num_unsigned;
-    void *ptr1, *ptr2;
+    ptrdiff_t operand_left_signed, operand_right_signed;
+    size_t operand_left_unsigned, operand_right_unsigned;
     
     if(array->size < 2){
         fprintf(stderr, "Stack cannot have less than two items when performing an arithmetic operation\n");
         return EXIT_FAILURE;
     }
 
-    ptr1 = dyn_array_get(array, array->size - 2);
-    if(check_if_null_ptr(ptr1)){
-        return EXIT_FAILURE;
-    }
-    ptr2 = dyn_array_get(array, array->size - 1);
-    if(check_if_null_ptr(ptr2)){
-        return EXIT_FAILURE;
-    }
-
     if(is_signed){
+        if(dyn_array_pop_back(array, &operand_right_signed) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+        if(dyn_array_pop_back(array, &operand_left_signed) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+
         switch(op){
-            case '+': num_signed = (*(ptrdiff_t *)ptr1) + (*(ptrdiff_t *)ptr2); break;
-            case '-': num_signed = (*(ptrdiff_t *)ptr1) - (*(ptrdiff_t *)ptr2); break;
-            case '*': num_signed = (*(ptrdiff_t *)ptr1) * (*(ptrdiff_t *)ptr2); break;
+            case '+': operand_left_signed = operand_left_signed + operand_right_signed; break;
+            case '-': operand_left_signed = operand_left_signed - operand_right_signed; break;
+            case '*': operand_left_signed = operand_left_signed * operand_right_signed; break;
             case '/':
-                if((*(ptrdiff_t *)ptr2) == 0){
+                if(operand_right_signed == 0){
                     fprintf(stderr, "Stack's top item cannot be zero when performing an integer division operation\n");
                     return EXIT_FAILURE;
                 }
-                num_signed = (*(ptrdiff_t *)ptr1) / (*(ptrdiff_t *)ptr2);
+                operand_left_signed = operand_left_signed / operand_right_signed;
                 break;
             case '%':
-                if((*(ptrdiff_t *)ptr2) == 0){
+                if(operand_right_signed == 0){
                     fprintf(stderr, "Stack's top item cannot be zero when performing a modulo operation\n");
                     return EXIT_FAILURE;
                 }
-                num_signed = (*(ptrdiff_t *)ptr1) % (*(ptrdiff_t *)ptr2);
+                operand_left_signed = operand_left_signed % operand_right_signed;
                 break;
             default:
                 fprintf(stderr, "Unrecognised arithmetic operation (ASCII: %d)\n", op);
                 return EXIT_FAILURE;
         }
 
-        if(dyn_array_set(array, array->size - 1, &num_signed) == EXIT_FAILURE){
+        if(dyn_array_push_back(array, &operand_left_signed) == EXIT_FAILURE){
             return EXIT_FAILURE;
         }
-        --array->size;
     }
     else{
+        if(dyn_array_pop_back(array, &operand_right_unsigned) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+        if(dyn_array_pop_back(array, &operand_left_unsigned) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+
         switch(op){
-            case '+': num_unsigned = (*(size_t *)ptr1) + (*(size_t *)ptr2); break;
-            case '-': num_unsigned = (*(size_t *)ptr1) - (*(size_t *)ptr2); break;
-            case '*': num_unsigned = (*(size_t *)ptr1) * (*(size_t *)ptr2); break;
+            case '+': operand_left_unsigned = operand_left_unsigned + operand_right_unsigned; break;
+            case '-': operand_left_unsigned = operand_left_unsigned - operand_right_unsigned; break;
+            case '*': operand_left_unsigned = operand_left_unsigned * operand_right_unsigned; break;
             case '/':
-                if((*(size_t *)ptr2) == 0){
+                if(operand_right_unsigned == 0){
                     fprintf(stderr, "Stack's top item cannot be zero when performing an integer division operation\n");
                     return EXIT_FAILURE;
                 }
-                num_unsigned = (*(size_t *)ptr1) / (*(size_t *)ptr2);
+                operand_left_unsigned = operand_left_unsigned / operand_right_unsigned;
                 break;
             case '%':
-                if((*(size_t *)ptr2) == 0){
+                if(operand_right_unsigned == 0){
                     fprintf(stderr, "Stack's top item cannot be zero when performing a modulo operation\n");
                     return EXIT_FAILURE;
                 }
-                num_unsigned = (*(size_t *)ptr1) % (*(size_t *)ptr2);
+                operand_left_unsigned = operand_left_unsigned % operand_right_unsigned;
                 break;
             default:
                 fprintf(stderr, "Unrecognised arithmetic operation (ASCII: %d)\n", op);
                 return EXIT_FAILURE;
         }
 
-        if(dyn_array_set(array, array->size - 1, &num_unsigned) == EXIT_FAILURE){
+        if(dyn_array_push_back(array, &operand_left_unsigned) == EXIT_FAILURE){
             return EXIT_FAILURE;
         }
-        --array->size;
     }
 
     return EXIT_SUCCESS;

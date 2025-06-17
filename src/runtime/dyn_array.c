@@ -46,16 +46,29 @@ int dyn_array_push_back(DynArray* array, const void* element) {
     }
 
     memcpy((char*)array->data + array->size * array->element_size, element, array->element_size);
-    array->size++;
+    ++array->size;
     return EXIT_SUCCESS;
 }
 
-void* dyn_array_get(DynArray* array, size_t index) {
+int dyn_array_pop_back(DynArray *array, void *element){
+    if(array->size == 0){
+        fprintf(stderr, "Cannot perform a pop operation on an empty array\n");
+        return EXIT_FAILURE;
+    }
+
+    memcpy(element, (char*)array->data + (array->size - 1) * array->element_size, array->element_size);
+    --array->size;
+    return EXIT_SUCCESS;
+}
+
+int dyn_array_get(DynArray* array, size_t index, void *element) {
     if (index >= array->capacity) {
-        return NULL;
+        fprintf(stderr, "Index out of bounds\n");
+        return EXIT_FAILURE;
     }
     
-    return (char*)array->data + index * array->element_size;
+    memcpy(element, (char*)array->data + index * array->element_size, array->element_size);
+    return EXIT_SUCCESS;
 }
 
 int dyn_array_set(DynArray* array, size_t index, const void* element) {

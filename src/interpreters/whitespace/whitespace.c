@@ -19,17 +19,17 @@ void free_execution_resources_whitespace(DynArray *tokens, DynArray *stack, DynA
 bool match_ws_label(Label *label, DynArray *against_labels, size_t *matching_label_idx){
     size_t idx = 0;
     while(idx < against_labels->size){
-        Label *candidate = (Label *)dyn_array_get(against_labels, idx);
-        if(check_if_null_ptr(candidate))
-            return false;
+        Label candidate;
+        if(dyn_array_get(against_labels, idx, &candidate) == EXIT_FAILURE)
+            return EXIT_FAILURE;
         // printf("label length: %zu, %zu\n", label->id.size, candidate->id.size);
 
-        if(label->id.size != candidate->id.size){
+        if(label->id.size != candidate.id.size){
             ++idx;
             continue;
         }
         
-        if(check_array_equality_size_t((size_t *)label->id.data, (size_t *)candidate->id.data, label->id.size)){
+        if(check_array_equality_size_t((size_t *)label->id.data, (size_t *)candidate.id.data, label->id.size)){
             *matching_label_idx = idx;
             return true;
         }
@@ -46,10 +46,11 @@ int jump_to_label(DynArray *tokens, DynArray *labels, size_t *tokens_idx, size_t
     }
     
     if(match_ws_label(tmp_label, labels, idx)){
-        Label *tmp = (Label *)dyn_array_get(labels, *idx);
-        if(check_if_null_ptr(tmp))
+        Label tmp;
+        if(dyn_array_get(labels, *idx, &tmp) == EXIT_FAILURE)
             return EXIT_FAILURE;
-        *tokens_idx = tmp->instruction_index + 1;
+
+        *tokens_idx = tmp.instruction_index + 1;
         return EXIT_SUCCESS;
     }
     else{
@@ -98,13 +99,10 @@ int execute_whitespace_file(FILE* fptr){
     }
 
     while(tokens_idx < tokens.size){
-        ptr1 = dyn_array_get(&tokens, tokens_idx++);
-        if(check_if_null_ptr(ptr1)){
+        if(dyn_array_get(&tokens, tokens_idx++, &cmd) == EXIT_FAILURE){
             free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
             return EXIT_FAILURE;
         }
-            
-        cmd = *(size_t *)ptr1;
         // printf("curr: %zu, size: %zu\n", tokens_idx, tokens.size);
         
         switch(cmd){
@@ -116,13 +114,10 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_pop_back(&stack, &heap_addr) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                heap_addr = *(size_t *)ptr1;
-                --stack.size;
 
                 if(read_in_char_ws(&ch) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -154,13 +149,10 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_pop_back(&stack, &heap_addr) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                heap_addr = *(size_t *)ptr1;
-                --stack.size;
 
                 if(read_in_number_ws(&num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -193,13 +185,10 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
                 
-                ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_pop_back(&stack, &ch) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                ch = *(unsigned char *)ptr1;
-                --stack.size;
 
                 if(out_char_ws(ch) == EXIT_FAILURE)
                     return EXIT_FAILURE;
@@ -212,13 +201,10 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_pop_back(&stack, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                num = *(ptrdiff_t *)ptr1;
-                --stack.size;
 
                 if(out_number_ws(num) == EXIT_FAILURE)
                     return EXIT_FAILURE;
@@ -245,12 +231,15 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                ptr1 = dyn_array_get(&stack, stack.size - 1);
+                if(dyn_array_get(&stack, stack.size - 1, &tmp) == EXIT_FAILURE){
+                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
+                    return EXIT_FAILURE;
+                }
                 if(check_if_null_ptr(ptr1)){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                if(dyn_array_push_back(&stack, ptr1) == EXIT_FAILURE){
+                if(dyn_array_push_back(&stack, &tmp) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -263,25 +252,21 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_pop_back(&stack, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr2)){
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-
-                tmp = *(ptrdiff_t *)ptr1;
-
-                if(dyn_array_set(&stack, stack.size - 2, ptr2) == EXIT_FAILURE){
+                if(dyn_array_pop_back(&stack, &tmp) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
 
-                if(dyn_array_set(&stack, stack.size - 1, &tmp) == EXIT_FAILURE){
+                if(dyn_array_push_back(&stack, &num) == EXIT_FAILURE){
+                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
+                    return EXIT_FAILURE;
+                }
+
+                if(dyn_array_push_back(&stack, &tmp) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -308,12 +293,10 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                ptr1 = dyn_array_get(&stack, stack.size - 1 - num);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_get(&stack, stack.size - 1 - num, &tmp) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                tmp = *(ptrdiff_t *)ptr1;
                 
                 if(dyn_array_push_back(&stack, &tmp) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -397,12 +380,10 @@ int execute_whitespace_file(FILE* fptr){
                     
                 break;
             case FC_TS_l:
-                ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_get(&stack, stack.size - 1, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                num = *(ptrdiff_t *)ptr1;
                 
                 if(num == 0){
                     if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
@@ -419,12 +400,10 @@ int execute_whitespace_file(FILE* fptr){
                     
                 break;
             case FC_TT_l:
-                ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_get(&stack, stack.size - 1, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                num = *(ptrdiff_t *)ptr1;
                     
                 if(num < 0){
                     if(jump_to_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
@@ -442,20 +421,17 @@ int execute_whitespace_file(FILE* fptr){
                 break;
             case FC_TL:
                 if(call_stack.size > 0){
-                    ptr1 = dyn_array_get(&call_stack, call_stack.size - 1);
-                    if(check_if_null_ptr(ptr1)){
+                    if(dyn_array_pop_back(&call_stack, &idx) == EXIT_FAILURE){
                         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                         return EXIT_FAILURE;
                     }
-                    idx = *(size_t *)ptr1;
                 }
                 else{
                     fprintf(stderr, "Call stack cannot be empty when ending a subroutine\n");
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-
-                --call_stack.size;
+                
                 tokens_idx = idx;
 
                 break;
@@ -471,20 +447,16 @@ int execute_whitespace_file(FILE* fptr){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                
-                ptr1 = dyn_array_get(&stack, stack.size - 2);
-                if(check_if_null_ptr(ptr1)){
+
+                if(dyn_array_pop_back(&stack, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-                ptr2 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr2)){
+                if(dyn_array_pop_back(&stack, &heap_addr) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                 
-                heap_addr = *(size_t *)ptr1;
-                num = *(ptrdiff_t *)ptr2;
                 if(heap_addr >= heap.capacity){
                     new_cap = heap.capacity * 2;
                     while(new_cap <= heap_addr)
@@ -502,8 +474,6 @@ int execute_whitespace_file(FILE* fptr){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                         return EXIT_FAILURE;
                 }
-                
-                stack.size -= 2;
                     
                 break;
             case HP_T:
@@ -513,14 +483,11 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                ptr1 = dyn_array_get(&stack, stack.size - 1);
-                if(check_if_null_ptr(ptr1)){
+                if(dyn_array_pop_back(&stack, &heap_addr) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-
-                heap_addr = *(size_t *)ptr1;
-                --stack.size;
+                
                 if(heap_addr >= heap.capacity){
                     new_cap = heap.capacity * 2;
                     while(new_cap <= heap_addr)
@@ -534,13 +501,10 @@ int execute_whitespace_file(FILE* fptr){
                     }
                 }
 
-                ptr2 = dyn_array_get(&heap, heap_addr);
-                if(check_if_null_ptr(ptr2)){
+                if(dyn_array_get(&heap, heap_addr, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
-
-                num = *(ptrdiff_t *)ptr2;
 
                 if(dyn_array_push_back(&stack, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
