@@ -79,7 +79,10 @@ int get_ws_label(DynArray *tokens, size_t *idx, DynArray *label){
     size_t c;
 
     while(*idx < tokens->size){
-        c = *(size_t *)dyn_array_get(tokens, (*idx)++);
+        if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE){
+            dyn_array_free(label);
+            return EXIT_FAILURE;
+        }
 
         switch (c) {
             case SPACE_RAW:

@@ -73,7 +73,6 @@ int execute_whitespace_file(FILE* fptr){
     ptrdiff_t num, tmp;
     Label tmp_label;
     unsigned char ch;
-    void *ptr1 = NULL, *ptr2 = NULL;
 
     if(tokenize_whitespace(fptr, &tokens, &labels) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -232,10 +231,6 @@ int execute_whitespace_file(FILE* fptr){
                 }
 
                 if(dyn_array_get(&stack, stack.size - 1, &tmp) == EXIT_FAILURE){
-                    free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
-                    return EXIT_FAILURE;
-                }
-                if(check_if_null_ptr(ptr1)){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
