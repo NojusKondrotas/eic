@@ -7,20 +7,12 @@
 #include "../../include/numerics.h"
 
 int tokenize_befunge93(FILE *fptr, unsigned char *grid){
-    grid = (unsigned char *)malloc(GRID_VERTICAL_CAP * GRID_HORIZONTAL_CAP);
-    if(!grid){
-        fprintf(stderr, "Failure allcoating memory\n");
-        return EXIT_FAILURE;
-    }
-    
-    memset(grid, SPACE, GRID_VERTICAL_CAP * GRID_HORIZONTAL_CAP);
-    
-
     size_t horizontal_index = 0, vertical_index = 0;
 
     int c;
 
     while((c = fgetc(fptr)) != EOF && vertical_index < GRID_VERTICAL_CAP){
+        horizontal_index = 0;
         while(c != LF && horizontal_index < GRID_HORIZONTAL_CAP){
             grid[vertical_index * GRID_HORIZONTAL_CAP + horizontal_index] = c;
 

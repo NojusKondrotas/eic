@@ -156,10 +156,10 @@ int stack_duplicate_element(DynArray *stack, size_t index){
         return EXIT_FAILURE;
     }
 
-    if(dyn_array_get(stack, index, tmp) == EXIT_FAILURE){
+    if(dyn_array_get(stack, index, &tmp) == EXIT_FAILURE){
         return EXIT_FAILURE;
     }
-    return dyn_array_push_back(stack, tmp);
+    return dyn_array_push_back(stack, &tmp);
 }
 
 int stack_swap_top(DynArray *stack){
