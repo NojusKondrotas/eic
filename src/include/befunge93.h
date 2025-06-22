@@ -14,6 +14,8 @@
 
 void free_execution_resources_befunge93(unsigned char *grid, DynArray *stack);
 
+int funge_stack_pop(DynArray *stack, void *element);
+
 int execute_befunge93_file(FILE* fptr);
 
 int execute_befunge93(char *file_name);
