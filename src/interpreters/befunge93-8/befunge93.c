@@ -13,14 +13,6 @@ void free_execution_resources_befunge93(unsigned char *grid, DynArray *stack){
     dyn_array_free(stack);
 }
 
-int funge_stack_pop(DynArray *stack, void *element){
-    if(stack->size == 0)
-        memset(element, 0, stack->element_size);
-    else return dyn_array_pop_back(stack, element);
-
-    return EXIT_SUCCESS;
-}
-
 int execute_befunge93_file(FILE* fptr){
     unsigned char *grid;
     grid = (unsigned char *)malloc(GRID_VERTICAL_CAP * GRID_HORIZONTAL_CAP);
@@ -46,8 +38,6 @@ int execute_befunge93_file(FILE* fptr){
     unsigned char io_character;
     int rand_res;
     ptrdiff_t x, y, val;
-    // printf("%i\n", grid[0]);
-    // printf("%i\n", grid[GRID_HORIZONTAL_CAP]);
 
     while(1){
         c = grid[ip[1] * caps[0] + ip[0]];
@@ -75,6 +65,13 @@ int execute_befunge93_file(FILE* fptr){
             case Multiply:
             case Int_Divide:
             case Modulo:
+                while(stack.size < 2){
+                    val = 0;
+                    if(dyn_array_push_back(&stack, &val) == EXIT_FAILURE){
+                        free_execution_resources_befunge93(grid, &stack);
+                        return EXIT_FAILURE;
+                    }
+                }
                 if(stack_arithmetic_top(&stack, true, c) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
@@ -83,9 +80,11 @@ int execute_befunge93_file(FILE* fptr){
                 break;
             case Logical_Not:
                 if(stack.size == 0){
-                    fprintf(stderr, "Stack size cannot be 0 when performing a logical not operation\n");
-                    free_execution_resources_befunge93(grid, &stack);
-                    return EXIT_FAILURE;
+                    val = 0;
+                    if(dyn_array_push_back(&stack, &val) == EXIT_FAILURE){
+                        free_execution_resources_befunge93(grid, &stack);
+                        return EXIT_FAILURE;
+                    }
                 }
                 if(dyn_array_pop_back(&stack, &x) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
@@ -103,10 +102,12 @@ int execute_befunge93_file(FILE* fptr){
     
                 break;
             case Greater_Than:
-                if(stack.size < 2){
-                    fprintf(stderr, "Stack size cannot be less than 2 when performing a greater than comparison\n");
-                    free_execution_resources_befunge93(grid, &stack);
-                    return EXIT_FAILURE;
+                while(stack.size < 2){
+                    val = 0;
+                    if(dyn_array_push_back(&stack, &val) == EXIT_FAILURE){
+                        free_execution_resources_befunge93(grid, &stack);
+                        return EXIT_FAILURE;
+                    }
                 }
 
                 if(dyn_array_pop_back(&stack, &x) == EXIT_FAILURE){
@@ -147,25 +148,25 @@ int execute_befunge93_file(FILE* fptr){
                 break;
             case Pop_Move_Horiz:
                 if(stack.size == 0){
-                    x = 0;
+                    val = 0;
                 }
-                else if(dyn_array_pop_back(&stack, &x) == EXIT_FAILURE){
+                else if(dyn_array_pop_back(&stack, &val) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
 
-                c = x == 0 ? Move_Right : Move_Left;
+                c = val == 0 ? Move_Right : Move_Left;
                 break;
             case Pop_Move_Vert:
                 if(stack.size == 0){
-                    x = 0;
+                    val = 0;
                 }
-                else if(dyn_array_pop_back(&stack, &x) == EXIT_FAILURE){
+                else if(dyn_array_pop_back(&stack, &val) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
 
-                c = x == 0 ? Move_Down : Move_Up;
+                c = val == 0 ? Move_Down : Move_Up;
                 break;
             case Bridge:
                 move_funge_ip(ip, delta, caps, BEFUNGE93_DIMENSIONS);
@@ -188,12 +189,28 @@ int execute_befunge93_file(FILE* fptr){
     
                 break;
             case Duplicate:
+                if(stack.size == 0){
+                    val = 0;
+                    if(dyn_array_push_back(&stack, &val) == EXIT_FAILURE){
+                        free_execution_resources_befunge93(grid, &stack);
+                        return EXIT_FAILURE;
+                    }
+                }
+
                 if(stack_duplicate_element(&stack, stack.size - 1) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
                 break;
             case Swap:
+                while(stack.size < 2){
+                    val = 0;
+                    if(dyn_array_push_back(&stack, &val) == EXIT_FAILURE){
+                        free_execution_resources_befunge93(grid, &stack);
+                        return EXIT_FAILURE;
+                    }
+                }
+
                 if(stack_swap_top(&stack) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
@@ -229,14 +246,14 @@ int execute_befunge93_file(FILE* fptr){
                 break;
             case Out_Int:
                 if(stack.size == 0){
-                    x = 0;
+                    val = 0;
                 }
-                else if(dyn_array_pop_back(&stack, &x) == EXIT_FAILURE){
+                else if(dyn_array_pop_back(&stack, &val) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
 
-                if(out_number(x) == EXIT_FAILURE){
+                if(out_number(val) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
@@ -256,15 +273,23 @@ int execute_befunge93_file(FILE* fptr){
                 }
                 break;
             case Put:
-                if(funge_stack_pop(&stack, &y) == EXIT_FAILURE){
+                while(stack.size < 3){
+                    val = 0;
+                    if(dyn_array_push_back(&stack, &val) == EXIT_FAILURE){
+                        free_execution_resources_befunge93(grid, &stack);
+                        return EXIT_FAILURE;
+                    }
+                }
+
+                if(dyn_array_pop_back(&stack, &y) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
-                if(funge_stack_pop(&stack, &x) == EXIT_FAILURE){
+                if(dyn_array_pop_back(&stack, &x) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
-                if(funge_stack_pop(&stack, &val) == EXIT_FAILURE){
+                if(dyn_array_pop_back(&stack, &val) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
@@ -274,18 +299,27 @@ int execute_befunge93_file(FILE* fptr){
                 grid[y * caps[0] + x] = val;
                 break;
             case Get:
-                if(funge_stack_pop(&stack, &y) == EXIT_FAILURE){
+                while(stack.size < 3){
+                    val = 0;
+                    if(dyn_array_push_back(&stack, &val) == EXIT_FAILURE){
+                        free_execution_resources_befunge93(grid, &stack);
+                        return EXIT_FAILURE;
+                    }
+                }
+
+                if(dyn_array_pop_back(&stack, &y) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
-                if(funge_stack_pop(&stack, &x) == EXIT_FAILURE){
+                if(dyn_array_pop_back(&stack, &x) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
 
                 x = (x % caps[0] + caps[0]) % caps[0];
                 y = (y % caps[1] + caps[1]) % caps[1];
-                if(dyn_array_push_back(&stack, &grid[y * caps[0] + x]) == EXIT_FAILURE){
+                val = grid[y * caps[0] + x];
+                if(dyn_array_push_back(&stack, &val) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }

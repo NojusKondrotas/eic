@@ -169,12 +169,12 @@ int stack_swap_top(DynArray *stack){
         return EXIT_FAILURE;
     }
 
-    if(dyn_array_pop_back(stack, first_pop) == EXIT_FAILURE)
+    if(dyn_array_pop_back(stack, &first_pop) == EXIT_FAILURE)
         return EXIT_FAILURE;
-    if(dyn_array_pop_back(stack, second_pop) == EXIT_FAILURE)
+    if(dyn_array_pop_back(stack, &second_pop) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    if(dyn_array_push_back(stack, first_pop) == EXIT_FAILURE)
+    if(dyn_array_push_back(stack, &first_pop) == EXIT_FAILURE)
         return EXIT_FAILURE;
-    return dyn_array_push_back(stack, second_pop);
+    return dyn_array_push_back(stack, &second_pop);
 }
