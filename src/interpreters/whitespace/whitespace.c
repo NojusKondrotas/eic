@@ -118,7 +118,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(in_char_whitespace(&ch) == EXIT_FAILURE){
+                if(in_char(&ch) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -153,7 +153,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(in_number_whitespace(&num) == EXIT_FAILURE){
+                if(in_number(&num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
@@ -189,7 +189,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(out_char_whitespace(ch) == EXIT_FAILURE)
+                if(out_char(ch) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                     
                 break;
@@ -205,7 +205,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
 
-                if(out_number_whitespace(num) == EXIT_FAILURE)
+                if(out_number(num) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                     
                 break;

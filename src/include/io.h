@@ -14,12 +14,12 @@ int tokenize_whitespace_raw(FILE *fptr, DynArray *array);
 
 int get_whitespace_label(DynArray *tokens, size_t *idx, DynArray *label);
 
-int in_char_whitespace(unsigned char *ch);
+int in_char(unsigned char *ch);
 
-int in_number_whitespace(ptrdiff_t *num);
+int in_number(ptrdiff_t *num);
 
-int out_char_whitespace(unsigned char ch);
+int out_char(unsigned char ch);
 
-int out_number_whitespace(ptrdiff_t number);
+int out_number(ptrdiff_t number);
 
 #endif

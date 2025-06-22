@@ -105,7 +105,7 @@ int get_whitespace_label(DynArray *tokens, size_t *idx, DynArray *label){
     return EXIT_FAILURE;
 }
 
-int in_char_whitespace(unsigned char *ch){
+int in_char(unsigned char *ch){
     int tmp = fgetc(stdin);
     
     if(tmp == EOF){
@@ -120,7 +120,7 @@ int in_char_whitespace(unsigned char *ch){
     return EXIT_SUCCESS;
 }
 
-int in_number_whitespace(ptrdiff_t *num){
+int in_number(ptrdiff_t *num){
     int sign, tmp = fgetc(stdin);
     *num = 0;
     if(tmp == '-'){
@@ -134,7 +134,7 @@ int in_number_whitespace(ptrdiff_t *num){
         sign = 1;
     }
     else{
-        fprintf(stderr, "Unexpected character encountered while reading Whitespace input (ASCII: %d)\n", tmp);
+        fprintf(stderr, "Unexpected character encountered while reading user input (ASCII: %d)\n", tmp);
         return EXIT_FAILURE;
     }
     
@@ -145,7 +145,7 @@ int in_number_whitespace(ptrdiff_t *num){
 
         tmp = fgetc(stdin);
         if(tmp == EOF){
-            fprintf(stderr, "Encountered unexpected end of stream while reading Whitespace console input\n");
+            fprintf(stderr, "Encountered unexpected end of stream while reading user input\n");
             return EXIT_FAILURE;
         }
     }
@@ -154,7 +154,7 @@ int in_number_whitespace(ptrdiff_t *num){
     return EXIT_SUCCESS;
 }
 
-int out_char_whitespace(unsigned char ch){
+int out_char(unsigned char ch){
     if(fprintf(stdout, "%c", ch) < 0){
         fprintf(stderr, "Error writing to stdout\n");
         return EXIT_FAILURE;
@@ -163,7 +163,7 @@ int out_char_whitespace(unsigned char ch){
     return EXIT_SUCCESS;
 }
 
-int out_number_whitespace(ptrdiff_t number){
+int out_number(ptrdiff_t number){
     if(fprintf(stdout, "%td", number) < 0){
         fprintf(stderr, "Error writing to stdout\n");
         return EXIT_FAILURE;
