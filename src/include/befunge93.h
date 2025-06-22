@@ -10,9 +10,9 @@
 #define GRID_HORIZONTAL_CAP 80
 #define GRID_VERTICAL_CAP 25
 
-void free_execution_resources_befunge93(unsigned char *grid, DynArray *stack);
+#define BEFUNGE93_DIMENSIONS 2
 
-int move_instruction_pointer(size_t *horizontal_index, size_t *vertical_index, unsigned char c);
+void free_execution_resources_befunge93(unsigned char *grid, DynArray *stack);
 
 int execute_befunge93_file(FILE* fptr);
 

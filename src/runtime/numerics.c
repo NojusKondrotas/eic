@@ -54,6 +54,12 @@ int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
     return EXIT_SUCCESS;
 }
 
+void move_funge_ip(size_t ip[], size_t delta[], size_t caps[], size_t dimensions){
+    for(size_t i = 0; i < dimensions; ++i){
+        ip[i] = (ip[i] + delta[i] + caps[i]) % caps[i];
+    }
+}
+
 bool check_array_equality_size_t(size_t *left, size_t *right, size_t length){
     for(size_t i = 0; i < length; ++i){
         // printf("first: %zX, second: %zX\n", left[i], right[i]);

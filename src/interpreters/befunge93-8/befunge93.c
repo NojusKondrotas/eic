@@ -11,45 +11,6 @@ void free_execution_resources_befunge93(unsigned char *grid, DynArray *stack){
     dyn_array_free(stack);
 }
 
-int move_instruction_pointer(size_t *horizontal_index, size_t *vertical_index, unsigned char c){
-    switch(c){
-        case Move_Right:
-            if(++(*horizontal_index) >= GRID_HORIZONTAL_CAP){
-                fprintf(stderr, "Cannot move right, reached max horizontal index\n");
-                return EXIT_FAILURE;
-            }
-
-            break;
-        case Move_Left:
-            if((*horizontal_index) == 0){
-                fprintf(stderr, "Cannot move left, reached min horizontal index\n");
-                return EXIT_FAILURE;
-            }
-
-            --(*horizontal_index);
-
-            break;
-        case Move_Up:
-            if((*vertical_index) == 0){
-                fprintf(stderr, "Cannot move up, reached min vertical index\n");
-                return EXIT_FAILURE;
-            }
-
-            --(*vertical_index);
-
-            break;
-        case Move_Down:
-            if(++(*vertical_index) >= GRID_VERTICAL_CAP){
-                fprintf(stderr, "Cannot move down, reached max vertical index\n");
-                return EXIT_FAILURE;
-            }
-
-            break;
-    }
-
-    return EXIT_SUCCESS;
-}
-
 int execute_befunge93_file(FILE* fptr){
     unsigned char *grid;
     if(tokenize_befunge93(fptr, grid) == EXIT_FAILURE)
@@ -61,15 +22,16 @@ int execute_befunge93_file(FILE* fptr){
         return EXIT_FAILURE;
     }
 
-    size_t horizontal_index = 0, vertical_index = 0;
+    size_t ip[2] = {0, 0};
+    size_t delta[2];
+    size_t caps[2] = {GRID_HORIZONTAL_CAP, GRID_VERTICAL_CAP};
     unsigned char c;
     // Utility variables
-    unsigned char move_direction = 0;
     int tmp;
     ptrdiff_t num_one, num_two;
 
     while(1){
-        c = grid[vertical_index * GRID_HORIZONTAL_CAP + horizontal_index];
+        c = grid[ip[1] * caps[0] + ip[0]];
 
         switch(c){
             case 0:
@@ -146,61 +108,52 @@ int execute_befunge93_file(FILE* fptr){
                 }
 
                 break;
-            case Move_Right:
-            case Move_Left:
-            case Move_Up:
-            case Move_Down:
-                move_direction = c;
-                break;
             case Move_Random:
                 tmp = rand() % 4;
                 switch(tmp){
-                    case 0: move_direction = Move_Right; break;
-                    case 1: move_direction = Move_Left; break;
-                    case 2: move_direction = Move_Up; break;
-                    case 3: move_direction = Move_Down; break;
+                    case 0:
+                        c = Move_Right;
+                        break;
+                    case 1:
+                        c = Move_Left;
+                        break;
+                    case 2:
+                        c = Move_Up;
+                        break;
+                    case 3:
+                        c = Move_Down;
+                        break;
                 }
-
                 break;
             case Pop_Move_Horiz:
-                if(dyn_array_pop_back(&stack, &num_one) == EXIT_FAILURE){
+                if(stack.size == 0){
+                    num_one = 0;
+                }
+                else if(dyn_array_pop_back(&stack, &num_one) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
 
-                move_direction = num_one == 0 ? Move_Right : Move_Left;
-    
+                c = num_one == 0 ? Move_Right : Move_Left;
                 break;
             case Pop_Move_Vert:
-                if(dyn_array_pop_back(&stack, &num_one) == EXIT_FAILURE){
+                if(stack.size == 0){
+                    num_one = 0;
+                }
+                else if(dyn_array_pop_back(&stack, &num_one) == EXIT_FAILURE){
                     free_execution_resources_befunge93(grid, &stack);
                     return EXIT_FAILURE;
                 }
 
-                move_direction = num_one == 0 ? Move_Down : Move_Up;
-    
+                c = num_one == 0 ? Move_Down : Move_Up;
                 break;
             case Bridge:
-                if(!move_direction){
-                    fprintf(stderr, "Cannot bridge the next cell with no intruction pointer movement direction (0:0 cell must contain a concise movement direction indicator)\n");
-                    free_execution_resources_befunge93(grid, &stack);
-                    return EXIT_FAILURE;
-                }
-                else{
-                    if(move_instruction_pointer(&horizontal_index, &vertical_index, move_direction) == EXIT_FAILURE){
-                        free_execution_resources_befunge93(grid, &stack);
-                        return EXIT_FAILURE;
-                    }
-                }
-    
+                move_funge_ip(ip, delta, caps, BEFUNGE93_DIMENSIONS);
                 break;
             case String_Endpoint:
-                if(move_instruction_pointer(&horizontal_index, &vertical_index, move_direction) == EXIT_FAILURE){
-                    free_execution_resources_befunge93(grid, &stack);
-                    return EXIT_FAILURE;
-                }
+                move_funge_ip(ip, delta, caps, BEFUNGE93_DIMENSIONS);
 
-                c = grid[vertical_index * GRID_HORIZONTAL_CAP + horizontal_index];
+                c = grid[ip[1] * caps[0] + ip[0]];
 
                 while(c != '\"'){
                     if(dyn_array_push_back(&stack, &c) != EXIT_FAILURE){
@@ -208,12 +161,9 @@ int execute_befunge93_file(FILE* fptr){
                         return EXIT_FAILURE;
                     }
                     
-                    if(move_instruction_pointer(&horizontal_index, &vertical_index, move_direction) == EXIT_FAILURE){
-                        free_execution_resources_befunge93(grid, &stack);
-                        return EXIT_FAILURE;
-                    }
+                    move_funge_ip(ip, delta, caps, BEFUNGE93_DIMENSIONS);
 
-                    c = grid[vertical_index * GRID_HORIZONTAL_CAP + horizontal_index];
+                    c = grid[ip[1] * caps[0] + ip[0]];
                 }
     
                 break;
@@ -257,17 +207,26 @@ int execute_befunge93_file(FILE* fptr){
                 break;
         }
 
-        if(!move_direction){
-            fprintf(stderr, "Received no intruction pointer movement direction (0:0 cell must contain a concise movement direction indicator)\n");
-            free_execution_resources_befunge93(grid, &stack);
-            return EXIT_FAILURE;
+        switch(c){
+            case Move_Right:
+                delta[0] = 1;
+                delta[1] = 0;
+                break;
+            case Move_Left:
+                delta[0] = -1;
+                delta[1] = 0;
+                break;
+            case Move_Up:
+                delta[0] = 0;
+                delta[1] = -1;
+                break;
+            case Move_Down:
+                delta[0] = 0;
+                delta[1] = 1;
+                break;
         }
-        else{
-            if(move_instruction_pointer(&horizontal_index, &vertical_index, move_direction) == EXIT_FAILURE){
-                free_execution_resources_befunge93(grid, &stack);
-                return EXIT_FAILURE;
-            }
-        }
+        
+        move_funge_ip(ip, delta, caps, BEFUNGE93_DIMENSIONS);
     }
     
     return EXIT_SUCCESS;
