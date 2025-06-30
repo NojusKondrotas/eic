@@ -106,7 +106,7 @@ int execute_whitespace_file(FILE* fptr){
         
         switch(cmd){
             // Handle IO command
-            case IO_TS:
+            case WS_IO_TS:
                 if(stack.size == 0){
                     fprintf(stderr, "Stack size cannot be 0 when performing a pop operation\n");
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -141,7 +141,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                 }
                 break;
-            case IO_TT:
+            case WS_IO_TT:
                 if(stack.size == 0){
                     fprintf(stderr, "Stack size cannot be 0 when performing a pop operation\n");
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -177,7 +177,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
                     
                 break;
-            case IO_SS:
+            case WS_IO_SS:
                 if(stack.size == 0){
                     fprintf(stderr, "Stack size cannot be 0 when performing a pop operation\n");
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -193,7 +193,7 @@ int execute_whitespace_file(FILE* fptr){
                     return EXIT_FAILURE;
                     
                 break;
-            case IO_ST:
+            case WS_IO_ST:
                 if(stack.size == 0){
                     fprintf(stderr, "Stack size cannot be 0 when performing a pop operation\n");
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -211,7 +211,7 @@ int execute_whitespace_file(FILE* fptr){
                 break;
 
             // Handle Stack Manipulation command
-            case SM_S_n:
+            case WS_SM_S_n:
                 if(parse_whitespace_number(&tokens, &tokens_idx, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
@@ -223,21 +223,21 @@ int execute_whitespace_file(FILE* fptr){
                 }
                 
                 break;
-            case SM_LS:
+            case WS_SM_LS:
                 if(stack_duplicate_element(&stack, stack.size - 1) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                  
                 break;
-            case SM_LT:
+            case WS_SM_LT:
                 if(stack_swap_top(&stack) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
-            case SM_LL:
+            case WS_SM_LL:
                 if(stack.size == 0){
                     fprintf(stderr, "Stack size cannot be 0 when performing a pop operation\n");
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -246,7 +246,7 @@ int execute_whitespace_file(FILE* fptr){
                 --stack.size;
                     
                 break;
-            case SM_TS_n:
+            case WS_SM_TS_n:
                 if(parse_whitespace_number(&tokens, &tokens_idx, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
@@ -264,7 +264,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
                     
                 break;
-            case SM_TL_n:
+            case WS_SM_TL_n:
                 if(parse_whitespace_number(&tokens, &tokens_idx, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
@@ -281,35 +281,35 @@ int execute_whitespace_file(FILE* fptr){
                 break;
 
             // Handle Arithmetic command
-            case AR_SS:
+            case WS_AR_SS:
                 if(stack_arithmetic_top(&stack, true, '+') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
-            case AR_ST:
+            case WS_AR_ST:
                 if(stack_arithmetic_top(&stack, true, '-') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
-            case AR_SL:
+            case WS_AR_SL:
                 if(stack_arithmetic_top(&stack, true, '*') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
-            case AR_TS:
+            case WS_AR_TS:
                 if(stack_arithmetic_top(&stack, true, '/') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
-            case AR_TT:
+            case WS_AR_TT:
                 if(stack_arithmetic_top(&stack, true, '%') == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
@@ -318,9 +318,9 @@ int execute_whitespace_file(FILE* fptr){
                 break;
 
             // Handle Flow Control command
-            case FC_SS_l:
+            case WS_FC_SS_l:
                 break;
-            case FC_ST_l:
+            case WS_FC_ST_l:
                 if(dyn_array_push_back(&call_stack, &tokens_idx) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
@@ -332,14 +332,14 @@ int execute_whitespace_file(FILE* fptr){
                 }
                     
                 break;
-            case FC_SL_l:
+            case WS_FC_SL_l:
                 if(jump_to_whitespace_label(&tokens, &labels, &tokens_idx, &idx, &tmp_label) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
                 }
                     
                 break;
-            case FC_TS_l:
+            case WS_FC_TS_l:
                 if(dyn_array_get(&stack, stack.size - 1, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
@@ -359,7 +359,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
                     
                 break;
-            case FC_TT_l:
+            case WS_FC_TT_l:
                 if(dyn_array_get(&stack, stack.size - 1, &num) == EXIT_FAILURE){
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
                     return EXIT_FAILURE;
@@ -379,7 +379,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
                     
                 break;
-            case FC_TL:
+            case WS_FC_TL:
                 if(call_stack.size > 0){
                     if(dyn_array_pop_back(&call_stack, &idx) == EXIT_FAILURE){
                         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -395,13 +395,13 @@ int execute_whitespace_file(FILE* fptr){
                 tokens_idx = idx;
 
                 break;
-            case FC_LL:
+            case WS_FC_LL:
                 free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
 
                 return EXIT_SUCCESS;
 
             // Handle Heap command
-            case HP_S:
+            case WS_HP_S:
                 if(stack.size < 2){
                     fprintf(stderr, "Stack count cannot be less than two when performing a heap storing operation\n");
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
@@ -436,7 +436,7 @@ int execute_whitespace_file(FILE* fptr){
                 }
                     
                 break;
-            case HP_T:
+            case WS_HP_T:
                 if(stack.size == 0){
                     fprintf(stderr, "Stack size cannot be zero when performing a heap retrieval operation\n");
                     free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);

@@ -23,7 +23,7 @@ int execute_brainfuck_file(FILE *fptr){
     
     int c;
     while((c = fgetc(fptr)) != EOF){
-        if(c != OP_JMP_FWD && c != OP_JMP_BCK && invalid_loop){
+        if(c != BF_JMP_FWD && c != BF_JMP_BCK && invalid_loop){
             ++pc;
             continue;
         }
@@ -35,27 +35,27 @@ int execute_brainfuck_file(FILE *fptr){
         }
 
         switch(c){
-            case OP_INC_PC:
+            case BF_INC_PC:
                 memc = (memc + 1) % TAPE_LENGTH;
                 break;
-            case OP_DEC_PC:
+            case BF_DEC_PC:
                 memc = (memc - 1 + TAPE_LENGTH) % TAPE_LENGTH;
                 break;
-            case OP_INC_VAL:
+            case BF_INC_VAL:
                 ++memory_tape[memc];
                 break;
-            case OP_DEC_VAL:
+            case BF_DEC_VAL:
                 --memory_tape[memc];
                 break;
-            case OP_IN:
+            case BF_IN:
                 unsigned char val;
                 in_brainfuck(&val);
                 memory_tape[memc] = val;
                 break;
-            case OP_OUT:
+            case BF_OUT:
                 putchar(memory_tape[memc]);
                 break;
-            case OP_JMP_FWD:
+            case BF_JMP_FWD:
                 loop_stack[loop_depth++] = pc;
 
                 if(memory_tape[memc] == 0){
@@ -64,7 +64,7 @@ int execute_brainfuck_file(FILE *fptr){
                 }
 
                 break;
-            case OP_JMP_BCK:
+            case BF_JMP_BCK:
                 if(loop_depth == 0){
                     return EXIT_FAILURE;
                 }

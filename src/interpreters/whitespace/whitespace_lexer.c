@@ -37,19 +37,19 @@ int tokenize_io(FILE *fptr, DynArray *tokens){
 
     switch(key){
         case WS_KEY(TAB, TAB):
-            val = IO_TT;
+            val = WS_IO_TT;
             return dyn_array_push_back(tokens, &val);
 
         case WS_KEY( SPACE, SPACE):
-            val = IO_SS;
+            val = WS_IO_SS;
             return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(TAB, SPACE):
-            val = IO_TS;
+            val = WS_IO_TS;
             return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(SPACE, TAB):
-            val = IO_ST;
+            val = WS_IO_ST;
             return dyn_array_push_back(tokens, &val);
 
         default:
@@ -70,23 +70,23 @@ int tokenize_arithmetic(FILE *fptr, DynArray *tokens){
 
     switch(key){
         case WS_KEY(SPACE, SPACE):
-            val = AR_SS;
+            val = WS_AR_SS;
             return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(SPACE, LF):
-            val = AR_SL;
+            val = WS_AR_SL;
             return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(TAB, TAB):
-            val = AR_TT;
+            val = WS_AR_TT;
             return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(TAB, SPACE):
-            val = AR_TS;
+            val = WS_AR_TS;
             return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(SPACE, TAB):
-            val = AR_ST;
+            val = WS_AR_ST;
             return dyn_array_push_back(tokens, &val);
 
         default:
@@ -103,11 +103,11 @@ int tokenize_heap(FILE *fptr, DynArray *tokens){
 
     switch(c){
         case SPACE:
-            val = HP_S;
+            val = WS_HP_S;
             return dyn_array_push_back(tokens, &val);
 
         case TAB:
-            val = HP_T;
+            val = WS_HP_T;
             return dyn_array_push_back(tokens, &val);
 
         default:
@@ -125,7 +125,7 @@ int tokenize_stack_manip(FILE *fptr, DynArray *tokens){
 
     switch(c1){
         case SPACE:
-            val = SM_S_n;
+            val = WS_SM_S_n;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
             
@@ -138,15 +138,15 @@ int tokenize_stack_manip(FILE *fptr, DynArray *tokens){
             key = WS_KEY(c1, c2);
             switch(key){
                 case WS_KEY(LF, SPACE):
-                    val = SM_LS;
+                    val = WS_SM_LS;
                     return dyn_array_push_back(tokens, &val);
 
                 case WS_KEY(LF, TAB):
-                    val = SM_LT;
+                    val = WS_SM_LT;
                     return dyn_array_push_back(tokens, &val);
 
                 case WS_KEY(LF, LF):
-                    val = SM_LL;
+                    val = WS_SM_LL;
                     return dyn_array_push_back(tokens, &val);
 
                 default:
@@ -161,14 +161,14 @@ int tokenize_stack_manip(FILE *fptr, DynArray *tokens){
             key = WS_KEY(c1, c2);
             switch(key){
                 case WS_KEY(TAB, SPACE):
-                    val = SM_TS_n;
+                    val = WS_SM_TS_n;
                     if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                         return EXIT_FAILURE;
 
                     return tokenize_whitespace_raw(fptr, tokens);
 
                 case WS_KEY(TAB, LF):
-                    val = SM_TL_n;
+                    val = WS_SM_TL_n;
                     if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                         return EXIT_FAILURE;
 
@@ -196,46 +196,46 @@ int tokenize_flow_control(FILE *fptr, DynArray *tokens, DynArray *labels){
     unsigned int key = WS_KEY(c1, c2);
     switch(key){
         case WS_KEY(SPACE, SPACE):
-            val = FC_SS_l;
+            val = WS_FC_SS_l;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return create_whitespace_label(fptr, tokens->size, labels);
         
         case WS_KEY(SPACE, TAB):
-            val = FC_ST_l;
+            val = WS_FC_ST_l;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_whitespace_raw(fptr, tokens);
 
         case WS_KEY(SPACE, LF):
-            val = FC_SL_l;
+            val = WS_FC_SL_l;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_whitespace_raw(fptr, tokens);
 
         case WS_KEY(TAB, SPACE):
-            val = FC_TS_l;
+            val = WS_FC_TS_l;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_whitespace_raw(fptr, tokens);
 
         case WS_KEY(TAB, TAB):
-            val = FC_TT_l;
+            val = WS_FC_TT_l;
             if(dyn_array_push_back(tokens, &val) == EXIT_FAILURE)
                 return EXIT_FAILURE;
 
             return tokenize_whitespace_raw(fptr, tokens);
 
         case WS_KEY(TAB, LF):
-            val = FC_TL;
+            val = WS_FC_TL;
             return dyn_array_push_back(tokens, &val);
 
         case WS_KEY(LF, LF):
-            val = FC_LL;
+            val = WS_FC_LL;
             return dyn_array_push_back(tokens, &val);
         
         default:
