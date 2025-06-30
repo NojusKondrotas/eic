@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -Iinclude -g
 # Source files
 SRC_ROOT = ../src/eic.c
 SRC_BF = ../src/interpreters/brainfuck/brainfuck.c
-SRC_BEFUNGE = $(wildcard ../src/interpreters/befunge93-8/*.c)
+SRC_BEFUNGE = $(wildcard ../src/interpreters/funge/*.c)
 SRC_WS = $(wildcard ../src/interpreters/whitespace/*.c)
 SRC_RUNTIME = $(wildcard ../src/runtime/*.c)
 

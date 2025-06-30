@@ -13,12 +13,12 @@ int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
 
     if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
-    while(c != LF_RAW && !sign){
+    while(c != WS_LF_RAW && !sign){
         switch(c){
-            case SPACE_RAW:
+            case WS_SPACE_RAW:
                 sign = 1;
                 break;
-            case TAB_RAW:
+            case WS_TAB_RAW:
                 sign = -1;
                 break;
             default:
@@ -35,12 +35,12 @@ int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){
 
     if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE)
         return EXIT_FAILURE;
-    while(c != LF_RAW){
+    while(c != WS_LF_RAW){
         switch(c){
-            case SPACE_RAW:
+            case WS_SPACE_RAW:
                 *number <<= 1;
                 break;
-            case TAB_RAW:
+            case WS_TAB_RAW:
                 *number <<= 1;
                 ++*number;
                 break;

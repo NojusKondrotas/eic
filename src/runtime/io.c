@@ -46,18 +46,18 @@ int tokenize_whitespace_raw(FILE *fptr, DynArray *array){
     while(c != EOF){
         switch (c) {
             case SPACE:
-                val = SPACE_RAW;
+                val = WS_SPACE_RAW;
                 if(dyn_array_push_back(array, &val) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                 break;
 
             case TAB:
-                val = TAB_RAW;
+                val = WS_TAB_RAW;
                 if (dyn_array_push_back(array, &val) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                 break;
             case LF:
-                val = LF_RAW;
+                val = WS_LF_RAW;
                 return dyn_array_push_back(array, &val);
         }
 
@@ -83,13 +83,13 @@ int get_whitespace_label(DynArray *tokens, size_t *idx, DynArray *label){
             return EXIT_FAILURE;
 
         switch (c) {
-            case SPACE_RAW:
-            case TAB_RAW:
+            case WS_SPACE_RAW:
+            case WS_TAB_RAW:
                 if(dyn_array_push_back(label, &c) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                     
                 break;
-            case LF_RAW:
+            case WS_LF_RAW:
                 if(dyn_array_push_back(label, &c) == EXIT_FAILURE)
                     return EXIT_FAILURE;
                 

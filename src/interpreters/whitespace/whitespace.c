@@ -70,7 +70,7 @@ int execute_whitespace_file(FILE* fptr){
     size_t tokens_idx = 0, cmd;
     // Utility variables
     size_t idx, heap_addr, new_cap;
-    ptrdiff_t num, tmp;
+    ptrdiff_t num;
     Label tmp_label;
     unsigned char ch;
 

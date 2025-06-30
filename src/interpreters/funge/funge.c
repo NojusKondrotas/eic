@@ -20,7 +20,7 @@ void *funge_space_init(size_t section_size){
 }
 
 //TO-DO: IMPLEMENT
-void funge_space_connect(FungeSpace *root, FungeSpace *other, ptrdiff_t offset_x, ptrdiff_t offset_y){
+int funge_space_connect(FungeSpace *root, FungeSpace *other, ptrdiff_t offset_x, ptrdiff_t offset_y){
     while(offset_x > 0){
         root = root->right;
         --offset_x;
@@ -38,7 +38,7 @@ void funge_space_connect(FungeSpace *root, FungeSpace *other, ptrdiff_t offset_x
         ++offset_y;
     }
 
-    return root;
+    return EXIT_SUCCESS;
 }
 
 void funge_space_free(FungeSpace *space){
@@ -61,8 +61,9 @@ void root_funge_space_free(FungeSpace *root){
     root_funge_space_free(down);
 }
 
-void free_execution_resources_funge(FungeSpace *root, DynArray *stack){
+void free_execution_resources_funge(FungeSpace *root, DynArray *stack, DynArray *IPs){
     dyn_array_free(stack);
+    dyn_array_free(IPs);
     root_funge_space_free(root);
 }
 
@@ -423,17 +424,20 @@ void free_execution_resources_funge(FungeSpace *root, DynArray *stack){
 //     return EXIT_SUCCESS;
 // }
 
-int execute_funge_file(FILE* fptr, size_t exec_flags, size_t exec_dimensions){
+int execute_funge_file(FILE* fptr, size_t exec_flags, int exec_dimensions){
     FungeSpace *root = NULL;
-    DynArray stack;
+    DynArray stack, IPs;
 
     if(tokenize_funge(fptr, root, exec_flags, exec_dimensions) == EXIT_FAILURE){
-        free_execution_resources_funge(root, &stack);
+        free_execution_resources_funge(root, &stack, &IPs);
         return EXIT_FAILURE;
     }
+
+    free_execution_resources_funge(root, &stack, &IPs);
+    return EXIT_SUCCESS;
 }
 
-int execute_funge(char *file_name, size_t exec_flags, size_t exec_dimensions){
+int execute_funge(char *file_name, size_t exec_flags, int exec_dimensions){
     FILE *fptr;
 
     if((fptr = fopen(file_name, "r")) == NULL){

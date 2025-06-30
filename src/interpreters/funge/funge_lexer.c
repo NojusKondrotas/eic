@@ -6,7 +6,7 @@
 #include "../../include/funge_lexer.h"
 #include "../../include/numerics.h"
 
-int tokenize_funge(FILE *fptr, FungeSpace *root, size_t exec_flags, size_t exec_dimensions){
+int tokenize_funge(FILE *fptr, FungeSpace *root, size_t exec_flags, int exec_dimensions){
     if(exec_flags & Unefunge_Flag)
         root = (FungeSpace *)funge_space_init(UNEFUNGE_SPACE_WIDTH);
     else

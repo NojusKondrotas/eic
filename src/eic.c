@@ -16,13 +16,15 @@ int main(int argc, char *argv[]){
     size_t eic_flags = 0;
 
     size_t funge_exec_flags = 0;
-    char funge_exec_dimensions = 0;
+    int funge_exec_dimensions = 0;
     
     char *extension = NULL;
 
     for(int i = 1; i < argc; ++i){
-        if(argv[i][0] == '-')
-            if(define_flag(++argv[i], &eic_flags, &funge_exec_flags, &funge_exec_dimensions) == EXIT_FAILURE) return EXIT_FAILURE;
+        if(argv[i][0] == '-'){
+            if(define_flag(++argv[i], &eic_flags, &funge_exec_flags, &funge_exec_dimensions) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+        }
         else{
             if(*(extension = get_extension(argv[i])) == '\0'){
                 fprintf(stderr, "File does not contain an extension: %s\n", argv[i]);
@@ -47,18 +49,18 @@ int main(int argc, char *argv[]){
         return execute_whitespace(extension);
     case BE:
     case BEFUNGE:
-        if(funge_exec_flags & 15 == 0) funge_exec_flags |= Funge93_Flag;
+        if((funge_exec_flags & 15) == 0) funge_exec_flags |= Funge93_Flag;
         if(!funge_exec_dimensions){
             funge_exec_flags |= Befunge_Flag;
             funge_exec_dimensions = 2;
         }
         return execute_funge(extension, funge_exec_flags, funge_exec_dimensions);
     case B93:
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0 && funge_exec_flags & Funge93_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0 && (funge_exec_flags & Funge93_Flag) == 0){
             fprintf(stderr, "Funge version must be 93' when running a .b93 file (P.S. specify --ignoreext EIC flag to ignore extension)\n");
             return EXIT_FAILURE;
         }
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0){
             if(!funge_exec_dimensions){
                 funge_exec_dimensions = 2;
                 funge_exec_flags |= Befunge_Flag;
@@ -66,11 +68,11 @@ int main(int argc, char *argv[]){
         }
         return execute_funge(extension, funge_exec_flags, funge_exec_dimensions);
     case B96:
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0 && funge_exec_flags & Funge96_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0 && (funge_exec_flags & Funge96_Flag) == 0){
             fprintf(stderr, "Funge version must be 96' when running a .b96 file (P.S. specify --ignoreext EIC flag to ignore extension)\n");
             return EXIT_FAILURE;
         }
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0){
             if(!funge_exec_dimensions){
                 funge_exec_dimensions = 2;
                 funge_exec_flags |= Befunge_Flag;
@@ -78,11 +80,11 @@ int main(int argc, char *argv[]){
         }
         return execute_funge(extension, funge_exec_flags, funge_exec_dimensions);
     case B97:
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0 && funge_exec_flags & Funge97_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0 && (funge_exec_flags & Funge97_Flag) == 0){
             fprintf(stderr, "Funge version must be 97' when running a .b97 file (P.S. specify --ignoreext EIC flag to ignore extension)\n");
             return EXIT_FAILURE;
         }
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0){
             if(!funge_exec_dimensions){
                 funge_exec_dimensions = 3;
                 funge_exec_flags |= Trefunge_Flag;
@@ -90,11 +92,11 @@ int main(int argc, char *argv[]){
         }
         return execute_funge(extension, funge_exec_flags, funge_exec_dimensions);
     case B98:
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0 && funge_exec_flags & Funge98_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0 && (funge_exec_flags & Funge98_Flag) == 0){
             fprintf(stderr, "Funge version must be 98' when running a .b98 file (P.S. specify --ignoreext EIC flag to ignore extension)\n");
             return EXIT_FAILURE;
         }
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0){
             if(!funge_exec_dimensions){
                 funge_exec_dimensions = 3;
                 funge_exec_flags |= Trefunge_Flag;
@@ -102,25 +104,25 @@ int main(int argc, char *argv[]){
         }
         return execute_funge(extension, funge_exec_flags, funge_exec_dimensions);
     case UF:
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0 && funge_exec_dimensions > 1){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0 && funge_exec_dimensions > 1){
             fprintf(stderr, "Funge operational dimensions cannot be more than 1D when running a .uf file (P.S. specify --ignoreext EIC flag to ignore extension)\n");
             return EXIT_FAILURE;
         }
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0){
             funge_exec_dimensions = 1;
             funge_exec_flags &= Unefunge_Flag;
-            if(funge_exec_flags & 15 == 0) funge_exec_flags |= Funge93_Flag;
+            if((funge_exec_flags & 15) == 0) funge_exec_flags |= Funge93_Flag;
         }
         return execute_funge(extension, funge_exec_flags, funge_exec_dimensions);
     case TF:
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0 && (funge_exec_dimensions != 3 || funge_exec_dimensions != 0)){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0 && (funge_exec_dimensions != 3 || funge_exec_dimensions != 0)){
             fprintf(stderr, "Funge operational dimensions must be 3D when running a .tf file (P.S. specify --ignoreext EIC flag to ignore extension)\n");
             return EXIT_FAILURE;
         }
-        if(eic_flags & EIC_IgnoreExtensions_Flag == 0){
+        if((eic_flags & EIC_IgnoreExtensions_Flag) == 0){
             funge_exec_dimensions = 3;
             funge_exec_flags &= Trefunge_Flag;
-            if(funge_exec_flags & 15 == 0) funge_exec_flags |= Funge98_Flag;
+            if((funge_exec_flags & 15) == 0) funge_exec_flags |= Funge98_Flag;
         }
         return execute_funge(extension, funge_exec_flags, funge_exec_dimensions);
     default:
@@ -131,7 +133,7 @@ int main(int argc, char *argv[]){
     return EXIT_SUCCESS;
 }
 
-int define_flag(char *str, size_t *eic_flags, size_t *funge_exec_flags, size_t *funge_exec_dimensions){
+int define_flag(char *str, size_t *eic_flags, size_t *funge_exec_flags, int *funge_exec_dimensions){
     size_t length = strlen(str);
     if(str[0] != '-'){
         for(size_t i = 0; i < length; ++i){
@@ -149,7 +151,7 @@ int define_flag(char *str, size_t *eic_flags, size_t *funge_exec_flags, size_t *
                     (*funge_exec_flags) |= Funge98_Flag;
                     break;
                 default:
-                    fprintf(stderr, "Unknown EIC interpreter flag: %c (ASCII: %d)\n", str[i], str[i]);
+                    fprintf(stderr, "Unknown EIC interpreter flag: -%c (ASCII: %d)\n", str[i], str[i]);
                     return EXIT_FAILURE;
             }
         }
@@ -192,22 +194,28 @@ int define_flag(char *str, size_t *eic_flags, size_t *funge_exec_flags, size_t *
         }
         (*funge_exec_dimensions) = 3;
     }
+    else{
+        fprintf(stderr, "Unknown EIC interpreter flag: -%s\n", str);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
 
-int check_flag_conflict(size_t eic_flags, size_t funge_exec_flags, size_t funge_exec_dimensions){
+int check_flag_conflict(size_t eic_flags, size_t funge_exec_flags, int funge_exec_dimensions){
     int op = eic_flags ^ (EIC_Brainfuck_Flag | EIC_Funge_Flag | EIC_WhiteSpace_Flag);
     if(op == EIC_Brainfuck_Flag || op == EIC_Funge_Flag || op == EIC_WhiteSpace_Flag || op == 0){
         fprintf(stderr, "Mutliple EIC language flags set, incompatibility\n");
         return EXIT_FAILURE;
     }
 
-    int op = funge_exec_flags ^ (Unefunge_Flag | Befunge_Flag | Trefunge_Flag);
+    op = funge_exec_flags ^ (Unefunge_Flag | Befunge_Flag | Trefunge_Flag);
     if(op == Unefunge_Flag || op == Befunge_Flag || op == Trefunge_Flag || op == 0){
         fprintf(stderr, "Mutliple Funge dimension flags set, incompatibility\n");
         return EXIT_FAILURE;
     }
 
-    int op = funge_exec_flags & 15;
+    op = (funge_exec_flags & 15);
     if(op != Funge93_Flag || op != Funge96_Flag || op != Funge97_Flag || op != Funge98_Flag){
         fprintf(stderr, "Mutliple Funge version flags set, incompatibility\n");
         return EXIT_FAILURE;
