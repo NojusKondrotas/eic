@@ -2,23 +2,25 @@
 #define FUNGE_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
 #include "dyn_array.h"
 
 #define UNEFUNGE_SPACE_WIDTH 64
 #define FUNGE_SPACE_HEIGHT 16
 #define FUNGE_SPACE_WIDTH 16
 
-// funge-space
-// ip
-
 typedef struct s_funge_space{
     ptrdiff_t *section;
-    FungeSpace *left, *right, *up, *down;
+    struct s_funge_space *left, *right, *up, *down;
 }FungeSpace;
 
 typedef struct s_funge_ip{
     FungeSpace *section;
     char x, y;
+    ptrdiff_t dx, dy;
+    DynArray *stack_stack, fingerprints;
+    int modes;
 }FungeIP;
 
 void *funge_space_init(size_t section_size);
