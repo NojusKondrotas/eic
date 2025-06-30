@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include "../include/dyn_array.h"
 #include "../include/numerics.h"
 #include "../include/whitespace_lexer.h"
-#include "../include/dyn_array.h"
 #include "../include/whitespace.h"
 
 int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number){

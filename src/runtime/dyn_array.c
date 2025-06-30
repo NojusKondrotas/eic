@@ -1,7 +1,7 @@
-#include "../include/dyn_array.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../include/dyn_array.h"
 
 int dyn_array_init(DynArray* array, size_t cap, size_t element_size) {
     array->data = calloc(cap, element_size);

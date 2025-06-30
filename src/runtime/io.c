@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "../include/io.h"
 #include "../include/dyn_array.h"
+#include "../include/io.h"
 #include "../include/whitespace.h"
 #include "../include/whitespace_lexer.h"
 

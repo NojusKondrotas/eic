@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "../../include/io.h"
-#include "../../include/whitespace.h"
-#include "../../include/numerics.h"
 #include "../../include/dyn_array.h"
+#include "../../include/io.h"
+#include "../../include/numerics.h"
+#include "../../include/whitespace.h"
 #include "../../include/whitespace_lexer.h"
 
 void free_execution_resources_whitespace(DynArray *tokens, DynArray *stack, DynArray *heap, DynArray *labels, DynArray *call_stack, DynArray *tmp_label_array){
