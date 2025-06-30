@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../include/whitespace.h"
-#include "../../include/whitespace_lexer.h"
 #include "../../include/io.h"
 #include "../../include/dyn_array.h"
+#include "../../include/numerics.h"
+#include "../../include/whitespace.h"
+#include "../../include/whitespace_lexer.h"
 
 int create_whitespace_label(FILE *fptr, size_t instr_idx, DynArray *labels){
     Label label;

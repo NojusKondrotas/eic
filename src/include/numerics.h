@@ -6,7 +6,12 @@
 #include <stddef.h>
 #include "dyn_array.h"
 
-typedef enum{ false, true } bool;
+#define TAB 9
+#define LF 10
+#define CARRIAGE 13
+#define SPACE 32
+
+typedef enum e_bool{ false, true } bool;
 
 int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number);
 
