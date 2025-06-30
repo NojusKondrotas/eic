@@ -77,22 +77,22 @@ int execute_whitespace_file(FILE* fptr){
     if(tokenize_whitespace(fptr, &tokens, &labels) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    if(dyn_array_init(&stack, STACK_CAP, sizeof(ptrdiff_t)) == EXIT_FAILURE){
+    if(dyn_array_init(&stack, DEFAULT_CONTAINER_CAP, sizeof(ptrdiff_t)) == EXIT_FAILURE){
         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
         return EXIT_FAILURE;
     }
     
-    if(dyn_array_init(&heap, HEAP_CAP, sizeof(ptrdiff_t)) == EXIT_FAILURE){
+    if(dyn_array_init(&heap, DEFAULT_CONTAINER_CAP, sizeof(ptrdiff_t)) == EXIT_FAILURE){
         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
         return EXIT_FAILURE;
     }
 
-    if(dyn_array_init(&call_stack, STACK_CAP, sizeof(size_t)) == EXIT_FAILURE){
+    if(dyn_array_init(&call_stack, DEFAULT_CONTAINER_CAP, sizeof(size_t)) == EXIT_FAILURE){
         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
         return EXIT_FAILURE;
     }
 
-    if(dyn_array_init(&tmp_label.id, STACK_CAP, 1) == EXIT_FAILURE){
+    if(dyn_array_init(&tmp_label.id, DEFAULT_CONTAINER_CAP, 1) == EXIT_FAILURE){
         free_execution_resources_whitespace(&tokens, &stack, &heap, &labels, &call_stack, &tmp_label.id);
         return EXIT_FAILURE;
     }

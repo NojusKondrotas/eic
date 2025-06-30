@@ -9,7 +9,7 @@
 int create_whitespace_label(FILE *fptr, size_t instr_idx, DynArray *labels){
     Label label;
     label.instruction_index = instr_idx - 1;
-    if(dyn_array_init(&label.id, LABELS_CAP, sizeof(size_t)) == EXIT_FAILURE)
+    if(dyn_array_init(&label.id, SMALLEST_CONTAINER_CAP, sizeof(size_t)) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
     if (tokenize_whitespace_raw(fptr, &label.id) == EXIT_FAILURE) {
@@ -245,10 +245,10 @@ int tokenize_flow_control(FILE *fptr, DynArray *tokens, DynArray *labels){
 }
 
 int tokenize_whitespace(FILE *fptr, DynArray *tokens, DynArray *labels){
-    if(dyn_array_init(tokens, TOKENS_CAP, sizeof(size_t)) == EXIT_FAILURE)
+    if(dyn_array_init(tokens, DEFAULT_CONTAINER_CAP, sizeof(size_t)) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
-    if(dyn_array_init(labels, TOKENS_CAP, sizeof(Label)) == EXIT_FAILURE){
+    if(dyn_array_init(labels, DEFAULT_CONTAINER_CAP, sizeof(Label)) == EXIT_FAILURE){
         dyn_array_free(tokens);
         return EXIT_FAILURE;
     }

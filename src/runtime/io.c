@@ -73,7 +73,7 @@ int tokenize_whitespace_raw(FILE *fptr, DynArray *array){
 }
 
 int get_whitespace_label(DynArray *tokens, size_t *idx, DynArray *label){
-    if(dyn_array_init(label, TOKENS_CAP, sizeof(size_t)) == EXIT_FAILURE){
+    if(dyn_array_init(label, BIGGER_CONTAINER_CAP, sizeof(size_t)) == EXIT_FAILURE){
         return EXIT_FAILURE;
     }
     size_t c;

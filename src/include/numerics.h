@@ -11,6 +11,12 @@
 #define CARRIAGE 13
 #define SPACE 32
 
+#define SMALLEST_CONTAINER_CAP 8
+#define SMALLER_CONTAINER_CAP 16
+#define DEFAULT_CONTAINER_CAP 32
+#define BIGGER_CONTAINER_CAP 64
+#define LARGE_CONTAINER_CAP 128
+
 typedef enum e_bool{ false, true } bool;
 
 int parse_whitespace_number(DynArray *tokens, size_t *idx, ptrdiff_t *number);

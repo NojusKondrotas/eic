@@ -6,10 +6,6 @@
 #include "dyn_array.h"
 #include "numerics.h"
 
-#define STACK_CAP 16
-#define HEAP_CAP 16
-#define LABELS_CAP 8
-
 typedef struct{
     DynArray id;
     size_t instruction_index;

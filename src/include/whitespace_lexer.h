@@ -6,8 +6,6 @@
 #include "numerics.h"
 #include "dyn_array.h"
 
-#define TOKENS_CAP 32
-
 #define IO_TS 0x00 //Pop a heap address from the stack, read a character as ASCII, and store that character to that heap address
 #define IO_TT 0x01 //Pop a heap address from the stack, read a number, and store that number to that heap address
 #define IO_SS 0x02 //Pop a number from the stack and output it as an ASCII character
