@@ -1,70 +1,77 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "../../include/dyn_array.h"
 #include "../../include/funge.h"
 #include "../../include/funge_lexer.h"
 
-void *funge_space_init(size_t section_size){
+void *funge_ip_init(FungeSpace *section, char *position, ptrdiff_t *delta, DynArray *stack_stack, DynArray *fingerprints, int modes){
+    FungeIP *ip_new = (FungeIP *)malloc(sizeof(FungeIP));
+    if(!ip_new) return NULL;
+
+    ip_new->section = section;
+    ip_new->position = position,
+    ip_new->delta = delta;
+    ip_new->stack_stack = stack_stack;
+    ip_new->fingerprints = *fingerprints;
+    ip_new->modes = modes;
+
+    return ip_new;
+}
+
+void funge_ip_free(FungeIP *ip){
+    ip->modes = 0;
+    free(ip->position);
+    free(ip->delta);
+    dyn_array_free(&ip->fingerprints);
+    free(ip);
+}
+
+void *funge_space_init(size_t id_x, size_t id_y, FungeSpace *root, FungeSpace *up, FungeSpace *down, size_t section_size, FungeSpace *left, FungeSpace *right){
     FungeSpace *space;
-    space = (FungeSpace *)calloc(1, sizeof(FungeSpace));
+    space = (FungeSpace *)malloc(sizeof(FungeSpace));
     if(!space) return space;
 
     space->section = (ptrdiff_t *)calloc(section_size, sizeof(ptrdiff_t));
     if(!space->section) return NULL;
-    space->right = NULL;
-    space->left = NULL;
-    space->up = NULL;
-    space->down = NULL;
+
+    space->id_x = id_x;
+    space->id_y = id_y;
+    space->root = root;
+    space->up = up;
+    space->down = down;
+    space->left = left;
+    space->right = right;
     
     return space;
 }
 
-//TO-DO: IMPLEMENT
-int funge_space_connect(FungeSpace *root, FungeSpace *other, ptrdiff_t offset_x, ptrdiff_t offset_y){
-    while(offset_x > 0){
-        root = root->right;
-        --offset_x;
-    }
-    while(offset_x < 0){
-        root = root->left;
-        ++offset_x;
-    }
-    while(offset_y > 0){
-        root = root->down;
-        --offset_y;
-    }
-    while(offset_y < 0){
-        root = root->up;
-        ++offset_y;
-    }
-
-    return EXIT_SUCCESS;
-}
-
 void funge_space_free(FungeSpace *space){
     if(!space) return;
-
+    FungeSpace *right = space->right, *left = space->left, *up = space->up, *down = space->down;
+    
+    space->id_x = 0;
+    space->id_y = 0;
     free(space->section);
     space->section = NULL;
     free(space);
     space = NULL;
+
+    if(right) right->left = NULL;
+    if(left) left->right = NULL;
+    if(up) up->down = NULL;
+    if(down) down->up = NULL;
+
+    funge_space_free(right);
+    funge_space_free(left);
+    funge_space_free(up);
+    funge_space_free(down);
 }
 
-void root_funge_space_free(FungeSpace *root){
-    if(!root) return;
-
-    FungeSpace *right = root->right, *left = root->left, *up = root->up , *down = root->down;
-    funge_space_free(root);
-    root_funge_space_free(right);
-    root_funge_space_free(left);
-    root_funge_space_free(up);
-    root_funge_space_free(down);
-}
-
-void free_execution_resources_funge(FungeSpace *root, DynArray *stack, DynArray *IPs){
+void free_execution_resources_funge(FungeSpace *origin_root, DynArray *stack, DynArray *IPs){
+    funge_space_free(origin_root);
     dyn_array_free(stack);
     dyn_array_free(IPs);
-    root_funge_space_free(root);
 }
 
 // int execute_befunge93_file(FILE* fptr){
@@ -425,15 +432,15 @@ void free_execution_resources_funge(FungeSpace *root, DynArray *stack, DynArray 
 // }
 
 int execute_funge_file(FILE* fptr, size_t exec_flags, int exec_dimensions){
-    FungeSpace *root = NULL;
-    DynArray stack, IPs;
+    FungeSpace *origin_root = NULL;
+    DynArray stack_stack, IPs;
 
-    if(tokenize_funge(fptr, root, exec_flags, exec_dimensions) == EXIT_FAILURE){
-        free_execution_resources_funge(root, &stack, &IPs);
+    if(tokenize_funge(fptr, origin_root, exec_flags, exec_dimensions) == EXIT_FAILURE){
+        free_execution_resources_funge(origin_root, &stack_stack, &IPs);
         return EXIT_FAILURE;
     }
 
-    free_execution_resources_funge(root, &stack, &IPs);
+    free_execution_resources_funge(origin_root, &stack_stack, &IPs);
     return EXIT_SUCCESS;
 }
 

@@ -7,44 +7,78 @@
 #include "../../include/numerics.h"
 
 int tokenize_funge(FILE *fptr, FungeSpace *root, size_t exec_flags, int exec_dimensions){
-    if(exec_flags & Unefunge_Flag)
-        root = (FungeSpace *)funge_space_init(UNEFUNGE_SPACE_WIDTH);
-    else
-        root = (FungeSpace *)funge_space_init(FUNGE_SPACE_HEIGHT * FUNGE_SPACE_WIDTH);
+    size_t max_length, max_size;
+    if(exec_flags & Unefunge_Flag){
+        max_length = UNEFUNGE_SPACE_LENGTH;
+        max_size = UNEFUNGE_SPACE_LENGTH;
+    }
+    else{
+        max_length = FUNGE_SPACE_LENGTH;
+        max_size = FUNGE_SPACE_LENGTH * FUNGE_SPACE_LENGTH;
+    }
 
+    root = (FungeSpace *)funge_space_init(0, 0, NULL, NULL, NULL, max_size, NULL, NULL);
     if(!root){
         fprintf(stderr, "Failure allocating memory\n");
-        free(root->right);
+        funge_space_free(root);
         return EXIT_FAILURE;
     }
+
+    FungeSpace *current_space = root;
+
     char horizontal_index = 0, vertical_index = 0;
 
     int c;
 
     while((c = fgetc(fptr)) != EOF){
         horizontal_index = 0;
-        while(c != LF){
-            if(horizontal_index >= FUNGE_SPACE_WIDTH){
-                if(exec_flags & Unefunge_Flag)
-                    root->right = (FungeSpace *)funge_space_init(UNEFUNGE_SPACE_WIDTH);
-                else
-                    root->right = (FungeSpace *)funge_space_init(FUNGE_SPACE_HEIGHT * FUNGE_SPACE_WIDTH);
-
-                if(!root->right){
+        if(vertical_index >= max_length){
+            if(!root->down){
+                root->down = (FungeSpace *)funge_space_init(0, root->id_y + 1, NULL, root, NULL, max_size, NULL, NULL);
+                if(!root->down){
                     fprintf(stderr, "Failure allocating memory\n");
-                    funge_space_free(root->right);
+                    funge_space_free(root);
                     return EXIT_FAILURE;
                 }
+                root = root->down;
+            }
+            size_t idx = current_space->id_x/max_length;
+            current_space = root;
+            while(idx-- > 0){
+                if(!current_space->right){
+                    current_space->right = (FungeSpace *)funge_space_init(current_space->id_x + 1, current_space->id_y, root, NULL, NULL, max_size, current_space, NULL);
+                    if(!current_space->right){
+                        fprintf(stderr, "Failure allocating memory\n");
+                        funge_space_free(root);
+                        return EXIT_FAILURE;
+                    }
+                    current_space = current_space->right;
+                }
+            }
+        }
+        
+        while(c != LF){
+            if(horizontal_index >= max_length){
+                if(exec_flags & Unefunge_Flag)
+                    current_space->right = (FungeSpace *)funge_space_init(current_space->id_x + 1, current_space->id_y, root, NULL, NULL, UNEFUNGE_SPACE_LENGTH, current_space, NULL);
+                else
+                    current_space->right = (FungeSpace *)funge_space_init(current_space->id_x + 1, current_space->id_y, root, NULL, NULL, FUNGE_SPACE_LENGTH * FUNGE_SPACE_LENGTH, current_space, NULL);
+
+                if(!current_space->right){
+                    fprintf(stderr, "Failure allocating memory\n");
+                    funge_space_free(root);
+                    return EXIT_FAILURE;
+                }
+                current_space = current_space->right;
                 horizontal_index = 0;
             }
 
+            current_space->section[vertical_index * max_length + horizontal_index++] = c;
+
             c = fgetc(fptr);
-            
-            ++horizontal_index;
         }
         
-        if(exec_flags & Unefunge_Flag)
-            return EXIT_SUCCESS;
+        if(exec_flags & Unefunge_Flag) return EXIT_SUCCESS;
 
         ++vertical_index;
     }
