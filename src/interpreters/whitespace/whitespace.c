@@ -67,7 +67,8 @@ int execute_whitespace_file(FILE* fptr){
     DynArray call_stack;
 
     // Execution variables
-    size_t tokens_idx = 0, cmd;
+    size_t tokens_idx = 0;
+    Whitespace_Op cmd;
     // Utility variables
     size_t idx, heap_addr, new_cap;
     ptrdiff_t num;

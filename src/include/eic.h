@@ -35,9 +35,9 @@ typedef enum e_eic_flags{
     EIC_WhiteSpace_Flag = 8
 }EICFlags;
 
-int define_flag(char *str, size_t *eic_flags, size_t *funge_exec_flags, int *funge_exec_dimensions);
+int define_flag(char *str, EICFlags *eic_flags, FungeFlags *funge_exec_flags, int *funge_exec_dimensions);
 
-int check_flag_conflict(size_t eic_flags, size_t funge_exec_flags, int funge_exec_dimensions);
+int check_flag_conflict(EICFlags eic_flags, FungeFlags funge_exec_flags, int funge_exec_dimensions);
 
 char *get_extension(char *str);
 

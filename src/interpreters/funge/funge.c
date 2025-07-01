@@ -431,7 +431,7 @@ void free_execution_resources_funge(FungeSpace *origin_root, DynArray *stack, Dy
 //     return EXIT_SUCCESS;
 // }
 
-int execute_funge_file(FILE* fptr, size_t exec_flags, int exec_dimensions){
+int execute_funge_file(FILE* fptr, FungeFlags exec_flags, int exec_dimensions){
     FungeSpace *origin_root = NULL;
     DynArray stack_stack, IPs;
 
@@ -444,7 +444,7 @@ int execute_funge_file(FILE* fptr, size_t exec_flags, int exec_dimensions){
     return EXIT_SUCCESS;
 }
 
-int execute_funge(char *file_name, size_t exec_flags, int exec_dimensions){
+int execute_funge(char *file_name, FungeFlags exec_flags, int exec_dimensions){
     FILE *fptr;
 
     if((fptr = fopen(file_name, "r")) == NULL){

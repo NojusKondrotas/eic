@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
+#include "eic.h"
 #include "funge.h"
 
 typedef enum e_bf93_op{
@@ -126,6 +127,6 @@ typedef enum e_funge98_op_sup_97{
     BF8_End = 'q'
 }Funge98_Op_Sup_97;
 
-int tokenize_funge(FILE *fptr, FungeSpace *origin_root, size_t exec_flags);
+int tokenize_funge(FILE *fptr, FungeSpace *origin_root, FungeFlags exec_flags);
 
 #endif

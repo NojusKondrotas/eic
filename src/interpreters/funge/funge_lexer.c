@@ -6,7 +6,7 @@
 #include "../../include/funge_lexer.h"
 #include "../../include/numerics.h"
 
-int tokenize_funge(FILE *fptr, FungeSpace *root, size_t exec_flags){
+int tokenize_funge(FILE *fptr, FungeSpace *root, FungeFlags exec_flags){
     size_t max_length, max_size;
     if(exec_flags & Unefunge_Flag){
         max_length = UNEFUNGE_SPACE_LENGTH;

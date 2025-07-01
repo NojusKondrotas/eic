@@ -245,7 +245,7 @@ int tokenize_flow_control(FILE *fptr, DynArray *tokens, DynArray *labels){
 }
 
 int tokenize_whitespace(FILE *fptr, DynArray *tokens, DynArray *labels){
-    if(dyn_array_init(tokens, DEFAULT_CONTAINER_CAP, sizeof(size_t)) == EXIT_FAILURE)
+    if(dyn_array_init(tokens, DEFAULT_CONTAINER_CAP, sizeof(Whitespace_Op)) == EXIT_FAILURE)
         return EXIT_FAILURE;
 
     if(dyn_array_init(labels, DEFAULT_CONTAINER_CAP, sizeof(Label)) == EXIT_FAILURE){

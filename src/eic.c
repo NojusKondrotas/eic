@@ -13,9 +13,9 @@ int main(int argc, char *argv[]){
         return EXIT_FAILURE;
     }
 
-    size_t eic_flags = 0;
+    EICFlags eic_flags = 0;
 
-    size_t funge_exec_flags = 0;
+    FungeFlags funge_exec_flags = 0;
     int funge_exec_dimension = 0;
     
     int source_idx = -1;
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]){
     return EXIT_SUCCESS;
 }
 
-int define_flag(char *str, size_t *eic_flags, size_t *funge_exec_flags, int *funge_exec_dimension){
+int define_flag(char *str, EICFlags *eic_flags, FungeFlags *funge_exec_flags, int *funge_exec_dimension){
     size_t length = strlen(str);
     if(str[0] != '-'){
         for(size_t i = 0; i < length; ++i){
@@ -253,7 +253,7 @@ int define_flag(char *str, size_t *eic_flags, size_t *funge_exec_flags, int *fun
     return EXIT_SUCCESS;
 }
 
-int check_flag_conflict(size_t eic_flags, size_t funge_exec_flags, int funge_exec_dimension){
+int check_flag_conflict(EICFlags eic_flags, FungeFlags funge_exec_flags, int funge_exec_dimension){
     int op = eic_flags & (EIC_Brainfuck_Flag | EIC_Funge_Flag | EIC_WhiteSpace_Flag);
     if(op != 0){
         if(op != EIC_Brainfuck_Flag && op != EIC_Funge_Flag && op != EIC_WhiteSpace_Flag){
