@@ -10,16 +10,23 @@
 #define FUNGE_SPACE_LENGTH 16
 
 typedef struct s_funge_space{
-    size_t id_x, id_y;
+    ptrdiff_t offset_x, offset_y;
     ptrdiff_t *section;
     struct s_funge_space *root, *up, *down, *left, *right;
 }FungeSpace;
+
+typedef struct s_funge_dimension_wrapper{
+    ptrdiff_t offset;
+    struct s_funge_dimension_wraper *high, *low, *dimension_higher, *dimension_lower;
+    FungeSpace *section_2D_root;
+}Funge_Dimension_Wrapper;
 
 typedef struct s_funge_ip{
     FungeSpace *section;
     char *position;
     ptrdiff_t *delta;
     DynArray *stack_stack, fingerprints;
+    FILE *filed_in, *filed_out;
     int modes;
 }FungeIP;
 

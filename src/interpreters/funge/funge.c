@@ -27,7 +27,7 @@ void funge_ip_free(FungeIP *ip){
     free(ip);
 }
 
-void *funge_space_init(size_t id_x, size_t id_y, FungeSpace *root, FungeSpace *up, FungeSpace *down, size_t section_size, FungeSpace *left, FungeSpace *right){
+void *funge_space_init(size_t offset_x, size_t offset_y, FungeSpace *root, FungeSpace *up, FungeSpace *down, size_t section_size, FungeSpace *left, FungeSpace *right){
     FungeSpace *space;
     space = (FungeSpace *)malloc(sizeof(FungeSpace));
     if(!space) return space;
@@ -35,8 +35,8 @@ void *funge_space_init(size_t id_x, size_t id_y, FungeSpace *root, FungeSpace *u
     space->section = (ptrdiff_t *)calloc(section_size, sizeof(ptrdiff_t));
     if(!space->section) return NULL;
 
-    space->id_x = id_x;
-    space->id_y = id_y;
+    space->offset_x = offset_x;
+    space->offset_y = offset_y;
     space->root = root;
     space->up = up;
     space->down = down;
@@ -50,8 +50,8 @@ void funge_space_free(FungeSpace *space){
     if(!space) return;
     FungeSpace *right = space->right, *left = space->left, *up = space->up, *down = space->down;
     
-    space->id_x = 0;
-    space->id_y = 0;
+    space->offset_x = 0;
+    space->offset_y = 0;
     free(space->section);
     space->section = NULL;
     free(space);
@@ -435,7 +435,7 @@ int execute_funge_file(FILE* fptr, size_t exec_flags, int exec_dimensions){
     FungeSpace *origin_root = NULL;
     DynArray stack_stack, IPs;
 
-    if(tokenize_funge(fptr, origin_root, exec_flags, exec_dimensions) == EXIT_FAILURE){
+    if(tokenize_funge(fptr, origin_root, exec_flags) == EXIT_FAILURE){
         free_execution_resources_funge(origin_root, &stack_stack, &IPs);
         return EXIT_FAILURE;
     }

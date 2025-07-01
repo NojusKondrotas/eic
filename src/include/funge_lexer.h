@@ -126,6 +126,6 @@ typedef enum e_funge98_op_sup_97{
     BF8_End = 'q'
 }Funge98_Op_Sup_97;
 
-int tokenize_funge(FILE *fptr, FungeSpace *origin_root, size_t exec_flags, int exec_dimensions);
+int tokenize_funge(FILE *fptr, FungeSpace *origin_root, size_t exec_flags);
 
 #endif
