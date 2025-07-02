@@ -4,6 +4,7 @@
 #include "../../include/dyn_array.h"
 #include "../../include/funge.h"
 #include "../../include/funge_lexer.h"
+#include "../../include/numerics.h"
 
 void *funge_ip_init(FungeSpace *section, char *position, ptrdiff_t *delta, DynArray *stack_stack, DynArray *fingerprints, int modes){
     FungeIP *ip_new = (FungeIP *)malloc(sizeof(FungeIP));
@@ -438,6 +439,57 @@ int execute_funge_file(FILE* fptr, FungeFlags exec_flags, int exec_dimensions){
     if(tokenize_funge(fptr, origin_root, exec_flags) == EXIT_FAILURE){
         free_execution_resources_funge(origin_root, &stack_stack, &IPs);
         return EXIT_FAILURE;
+    }
+
+    if(dyn_array_init(&stack_stack, SMALLEST_CONTAINER_CAP, sizeof(DynArray)) == EXIT_FAILURE){
+        free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+        return EXIT_FAILURE;
+    }
+    for(int i = 0; i < SMALLEST_CONTAINER_CAP; ++i){
+        DynArray tmp;
+        if(dyn_array_init(&tmp, DEFAULT_CONTAINER_CAP, sizeof(ptrdiff_t)) == EXIT_FAILURE){
+            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+            return EXIT_FAILURE;
+        }
+        if(dyn_array_push_back(&stack_stack, &tmp) == EXIT_FAILURE){
+            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+            return EXIT_FAILURE;
+        }
+    }
+
+    if(dyn_array_init(&IPs, SMALLEST_CONTAINER_CAP, sizeof(FungeIP)) == EXIT_FAILURE){
+        free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+        return EXIT_FAILURE;
+    }
+    {
+        char *tmp_pos_origin = (char *)calloc(exec_dimensions, sizeof(char));
+        if(!tmp_pos_origin){
+            fprintf(stderr, "Failure allocating memory\n");
+            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+            return EXIT_FAILURE;
+        }
+        ptrdiff_t *tmp_delta_origin = (ptrdiff_t *)calloc(exec_dimensions, sizeof(ptrdiff_t));
+        if(!tmp_delta_origin){
+            fprintf(stderr, "Failure allocating memory\n");
+            free(tmp_pos_origin);
+            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+            return EXIT_FAILURE;
+        }
+        FungeIP *tmp = funge_ip_init(origin_root, tmp_pos_origin, tmp_delta_origin, &stack_stack, NULL, 0);
+        if(!tmp){
+            fprintf(stderr, "Failure allocating memory\n");
+            free(tmp_pos_origin);
+            free(tmp_delta_origin);
+            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+            return EXIT_FAILURE;
+        }
+        if(dyn_array_push_back(&IPs, tmp) == EXIT_FAILURE){
+            fprintf(stderr, "Failure allocating memory\n");
+            free(tmp_pos_origin);
+            free(tmp_delta_origin);
+            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+            return EXIT_FAILURE;
+        }
     }
 
     free_execution_resources_funge(origin_root, &stack_stack, &IPs);
