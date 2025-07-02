@@ -7,18 +7,21 @@
 #include "../../include/whitespace_lexer.h"
 
 int create_whitespace_label(FILE *fptr, size_t instr_idx, DynArray *labels){
-    Label label;
+    Whitespace_Label label;
     label.instruction_index = instr_idx - 1;
-    if(dyn_array_init(&label.id, SMALLEST_CONTAINER_CAP, sizeof(size_t)) == EXIT_FAILURE)
+    label.id = (DynArray *)dyn_array_init(SMALLEST_CONTAINER_CAP, sizeof(Whitespace_Op));
+    if(!label.id){
+        fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
+    }
 
-    if (tokenize_whitespace_raw(fptr, &label.id) == EXIT_FAILURE) {
-        dyn_array_free(&label.id);
+    if (tokenize_whitespace_raw(fptr, label.id) == EXIT_FAILURE) {
+        dyn_array_free(label.id);
         return EXIT_FAILURE;
     }
     
     if(dyn_array_push_back(labels, &label) == EXIT_FAILURE){
-        dyn_array_free(&label.id);
+        dyn_array_free(label.id);
         return EXIT_FAILURE;
     }
 
@@ -244,12 +247,13 @@ int tokenize_flow_control(FILE *fptr, DynArray *tokens, DynArray *labels){
     }
 }
 
-int tokenize_whitespace(FILE *fptr, DynArray *tokens, DynArray *labels){
-    if(dyn_array_init(tokens, DEFAULT_CONTAINER_CAP, sizeof(Whitespace_Op)) == EXIT_FAILURE)
-        return EXIT_FAILURE;
-
-    if(dyn_array_init(labels, DEFAULT_CONTAINER_CAP, sizeof(Label)) == EXIT_FAILURE){
-        dyn_array_free(tokens);
+int tokenize_whitespace(FILE *fptr, DynArray **tokens, DynArray **labels){
+    *tokens = (DynArray *)dyn_array_init(DEFAULT_CONTAINER_CAP, sizeof(Whitespace_Op));
+    *labels = (DynArray *)dyn_array_init(DEFAULT_CONTAINER_CAP, sizeof(Whitespace_Label));
+    if(!*tokens || !*labels){
+        dyn_array_free(*tokens);
+        dyn_array_free(*labels);
+        fprintf(stderr, "Failure allocating memory\n");
         return EXIT_FAILURE;
     }
     
@@ -259,35 +263,35 @@ int tokenize_whitespace(FILE *fptr, DynArray *tokens, DynArray *labels){
         switch(imp_c1){
             case TAB:
                 if(read_whitespace_command_char(fptr, &imp_c2) == EXIT_FAILURE){
-                    dyn_array_free(tokens);
-                    dyn_array_free(labels);
+                    dyn_array_free(*tokens);
+                    dyn_array_free(*labels);
                     return EXIT_FAILURE;
                 }
 
                 unsigned int key = WS_KEY(imp_c1, imp_c2);
                 switch(key){
                     case WS_KEY(TAB, LF):
-                        if(tokenize_io(fptr, tokens) == EXIT_FAILURE){
-                            dyn_array_free(tokens);
-                            dyn_array_free(labels);
+                        if(tokenize_io(fptr, *tokens) == EXIT_FAILURE){
+                            dyn_array_free(*tokens);
+                            dyn_array_free(*labels);
                             return EXIT_FAILURE;
                         }
 
                         break;
 
                     case WS_KEY(TAB, SPACE):
-                        if(tokenize_arithmetic(fptr, tokens) == EXIT_FAILURE){
-                            dyn_array_free(tokens);
-                            dyn_array_free(labels);
+                        if(tokenize_arithmetic(fptr, *tokens) == EXIT_FAILURE){
+                            dyn_array_free(*tokens);
+                            dyn_array_free(*labels);
                             return EXIT_FAILURE;
                         }
 
                         break;
 
                     case WS_KEY(TAB, TAB):
-                        if(tokenize_heap(fptr, tokens) == EXIT_FAILURE){
-                            dyn_array_free(tokens);
-                            dyn_array_free(labels);
+                        if(tokenize_heap(fptr, *tokens) == EXIT_FAILURE){
+                            dyn_array_free(*tokens);
+                            dyn_array_free(*labels);
                             return EXIT_FAILURE;
                         }
 
@@ -295,24 +299,24 @@ int tokenize_whitespace(FILE *fptr, DynArray *tokens, DynArray *labels){
 
                     default:
                         fprintf(stderr, "Unrecognised character sequence while tokenizing whitespace IMP: (ASCII: %u %u)\n", (unsigned char)imp_c1, (unsigned char)imp_c2);
-                        dyn_array_free(tokens);
-                        dyn_array_free(labels);
+                        dyn_array_free(*tokens);
+                        dyn_array_free(*labels);
                         return EXIT_FAILURE;
                 }
                 break;
 
             case SPACE:
-                if(tokenize_stack_manip(fptr, tokens) == EXIT_FAILURE){
-                    dyn_array_free(tokens);
-                    dyn_array_free(labels);
+                if(tokenize_stack_manip(fptr, *tokens) == EXIT_FAILURE){
+                    dyn_array_free(*tokens);
+                    dyn_array_free(*labels);
                     return EXIT_FAILURE;
                 }
                 break;
 
             case LF:
-                if(tokenize_flow_control(fptr, tokens, labels) == EXIT_FAILURE){
-                    dyn_array_free(tokens);
-                    dyn_array_free(labels);
+                if(tokenize_flow_control(fptr, *tokens, *labels) == EXIT_FAILURE){
+                    dyn_array_free(*tokens);
+                    dyn_array_free(*labels);
                     return EXIT_FAILURE;
                 }
                 break;

@@ -56,6 +56,6 @@ int tokenize_stack_manip(FILE *fptr, DynArray *tokens);
 
 int tokenize_flow_control(FILE *fptr, DynArray *tokens, DynArray *labels);
 
-int tokenize_whitespace(FILE *fptr, DynArray *tokens, DynArray *labels);
+int tokenize_whitespace(FILE *fptr, DynArray **tokens, DynArray **labels);
 
 #endif

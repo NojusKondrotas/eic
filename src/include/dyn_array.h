@@ -3,14 +3,14 @@
 
 #include <stdlib.h>
 
-typedef struct {
+typedef struct s_dyn_array{
     void* data;
     size_t element_size;
     size_t capacity;
     size_t size;
-} DynArray;
+}DynArray;
 
-int dyn_array_init(DynArray* array, size_t cap, size_t element_size);
+DynArray *dyn_array_init(size_t cap, size_t element_size);
 
 void dyn_array_free(DynArray* array);
 

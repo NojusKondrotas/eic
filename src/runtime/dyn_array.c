@@ -3,18 +3,23 @@
 #include <string.h>
 #include "../include/dyn_array.h"
 
-int dyn_array_init(DynArray* array, size_t cap, size_t element_size) {
+DynArray *dyn_array_init(size_t cap, size_t element_size){
+    if(cap <= 0 || element_size <= 0) return NULL;
+
+    DynArray *array = malloc(cap * element_size);
+    
+    if(!array) return NULL;
+
     array->data = calloc(cap, element_size);
-    if(!array->data && cap > 0){
-        fprintf(stderr, "Failure allocating memory\n");
+    if(!array->data){
         dyn_array_free(array);
-        return EXIT_FAILURE;
+        return NULL;
     }
 
     array->element_size = element_size;
     array->capacity = cap;
     array->size = 0;
-    return EXIT_SUCCESS;
+    return array;
 }
 
 void dyn_array_free(DynArray* array) {

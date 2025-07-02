@@ -60,16 +60,6 @@ void move_funge_ip(size_t ip[], size_t delta[], size_t caps[], size_t dimensions
     }
 }
 
-bool check_array_equality_size_t(size_t *left, size_t *right, size_t length){
-    for(size_t i = 0; i < length; ++i){
-        // printf("first: %zX, second: %zX\n", left[i], right[i]);
-        if (left[i] != right[i])
-            return false;
-    }
-
-    return true;
-}
-
 int stack_arithmetic_top(DynArray *array, bool is_signed, unsigned char op){
     ptrdiff_t operand_left_signed, operand_right_signed;
     size_t operand_left_unsigned, operand_right_unsigned;

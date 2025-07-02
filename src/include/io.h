@@ -12,7 +12,7 @@ int read_whitespace_command_char(FILE *fptr, int *out_char);
 
 int tokenize_whitespace_raw(FILE *fptr, DynArray *array);
 
-int get_whitespace_label(DynArray *tokens, size_t *idx, DynArray *label);
+DynArray *get_whitespace_label(DynArray *tokens, size_t *idx);
 
 int in_char(unsigned char *ch);
 

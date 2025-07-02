@@ -42,7 +42,7 @@ int read_whitespace_command_char(FILE *fptr, int *out_char){
 
 int tokenize_whitespace_raw(FILE *fptr, DynArray *array){
     ptrdiff_t c = fgetc(fptr);
-    size_t val;
+    Whitespace_Op val;
     while(c != EOF){
         switch (c) {
             case SPACE:
@@ -72,37 +72,44 @@ int tokenize_whitespace_raw(FILE *fptr, DynArray *array){
     return EXIT_SUCCESS;
 }
 
-int get_whitespace_label(DynArray *tokens, size_t *idx, DynArray *label){
-    if(dyn_array_init(label, BIGGER_CONTAINER_CAP, sizeof(size_t)) == EXIT_FAILURE){
-        return EXIT_FAILURE;
-    }
-    size_t c;
+DynArray *get_whitespace_label(DynArray *tokens, size_t *idx){
+    DynArray *label_id = dyn_array_init(BIGGER_CONTAINER_CAP, sizeof(size_t));
+    if(!label_id) return NULL;
+    
+    Whitespace_Op c;
 
     while(*idx < tokens->size){
-        if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE)
-            return EXIT_FAILURE;
+        if(dyn_array_get(tokens, (*idx)++, &c) == EXIT_FAILURE){
+            dyn_array_free(label_id);
+            return NULL;
+        }
 
         switch (c) {
             case WS_SPACE_RAW:
             case WS_TAB_RAW:
-                if(dyn_array_push_back(label, &c) == EXIT_FAILURE)
-                    return EXIT_FAILURE;
+                if(dyn_array_push_back(label_id, &c) == EXIT_FAILURE){
+                    dyn_array_free(label_id);
+                    return NULL;
+                }
                     
                 break;
             case WS_LF_RAW:
-                if(dyn_array_push_back(label, &c) == EXIT_FAILURE)
-                    return EXIT_FAILURE;
+                if(dyn_array_push_back(label_id, &c) == EXIT_FAILURE){
+                    dyn_array_free(label_id);
+                    return NULL;
+                }
                 
-                return EXIT_SUCCESS;
+                return label_id;
             default:
-                fprintf(stderr, "Unexpected token encountered when reading label post-lexing\n");
-                dyn_array_free(label);
-                return EXIT_FAILURE;
+                fprintf(stderr, "Unexpected token encountered when reading label post-lexing: %d\n", c);
+                dyn_array_free(label_id);
+                return NULL;
         }
     }
 
     fprintf(stderr, "Unexpected end of tokens while reading label\n");
-    return EXIT_FAILURE;
+    dyn_array_free(label_id);
+    return NULL;
 }
 
 int in_char(unsigned char *ch){

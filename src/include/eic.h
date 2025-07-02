@@ -7,10 +7,10 @@
 #define WS 5863951 // Whitespace
 
 #define BE 5863244 // Funge
-#define B93 193485651 // Funge-93
+#define B93 193485651 // Befunge-93
 #define BEFUNGE 229460483486753 // Funge
 
-#define B96 193485654 // Funge-96
+#define B96 193485654 // Befunge-96
 
 #define B97 193485655 // Funge-97
 
