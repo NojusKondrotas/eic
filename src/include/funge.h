@@ -25,13 +25,13 @@ typedef struct s_funge_dimension_wrapper{
 typedef struct s_funge_ip{
     FungeSpace *section;
     char *position;
-    ptrdiff_t *delta;
-    DynArray *stack_stack, fingerprints;
+    ptrdiff_t *delta, *storage_offset;
+    DynArray *stack_stack_f98, *fingerprints;
     FILE *filed_in, *filed_out;
     int modes;
 }FungeIP;
 
-void *funge_ip_init(FungeSpace *section, char *position, ptrdiff_t *delta, DynArray *stack_stack, DynArray *fingerprints, int modes);
+void *funge_ip_init(FungeSpace *section, char *position, ptrdiff_t *delta, ptrdiff_t *storage_offset_b97_98, DynArray *stack_stack_f98, DynArray *fingerprints, int modes);
 
 void funge_ip_free(FungeIP *ip);
 

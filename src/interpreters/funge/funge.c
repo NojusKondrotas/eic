@@ -6,35 +6,40 @@
 #include "../../include/funge_lexer.h"
 #include "../../include/numerics.h"
 
-void *funge_ip_init(FungeSpace *section, char *position, ptrdiff_t *delta, DynArray *stack_stack, DynArray *fingerprints, int modes){
-    FungeIP *ip_new = (FungeIP *)malloc(sizeof(FungeIP));
-    if(!ip_new) return NULL;
+void *funge_ip_init(FungeSpace *section, char *position, ptrdiff_t *delta, ptrdiff_t *storage_offset, DynArray *stack_stack_f98, DynArray *fingerprints, int modes){
+    FungeIP *ip = (FungeIP *)malloc(sizeof(FungeIP));
+    if(!ip) return NULL;
 
-    ip_new->section = section;
-    ip_new->position = position,
-    ip_new->delta = delta;
-    ip_new->stack_stack = stack_stack;
-    ip_new->fingerprints = *fingerprints;
-    ip_new->modes = modes;
+    ip->section = section;
+    ip->position = position;
+    ip->delta = delta;
+    ip->storage_offset = storage_offset;
+    ip->stack_stack_f98 = stack_stack_f98;
+    ip->fingerprints = fingerprints;
+    ip->modes = modes;
 
-    return ip_new;
+    return ip;
 }
 
 void funge_ip_free(FungeIP *ip){
     ip->modes = 0;
     free(ip->position);
     free(ip->delta);
-    dyn_array_free(&ip->fingerprints);
+    free(ip->storage_offset);
+    dyn_array_free(ip->stack_stack_f98);
+    dyn_array_free(ip->fingerprints);
     free(ip);
 }
 
 void *funge_space_init(size_t offset_x, size_t offset_y, FungeSpace *root, FungeSpace *up, FungeSpace *down, size_t section_size, FungeSpace *left, FungeSpace *right){
-    FungeSpace *space;
-    space = (FungeSpace *)malloc(sizeof(FungeSpace));
-    if(!space) return space;
+    FungeSpace *space = (FungeSpace *)malloc(sizeof(FungeSpace));
+    if(!space) return NULL;
 
     space->section = (ptrdiff_t *)calloc(section_size, sizeof(ptrdiff_t));
-    if(!space->section) return NULL;
+    if(!space->section){
+        funge_space_free(space);
+        return NULL;
+    }
 
     space->offset_x = offset_x;
     space->offset_y = offset_y;
@@ -434,65 +439,120 @@ void free_execution_resources_funge(FungeSpace *origin_root, DynArray *stack, Dy
 
 int execute_funge_file(FILE* fptr, FungeFlags exec_flags, int exec_dimensions){
     FungeSpace *origin_root = NULL;
-    DynArray stack_stack, IPs;
+    DynArray *stack_b93_96_97 = NULL;
+    DynArray *IPs = NULL;
 
     if(tokenize_funge(fptr, origin_root, exec_flags) == EXIT_FAILURE){
-        free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+        free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
         return EXIT_FAILURE;
     }
 
-    if(dyn_array_init(&stack_stack, SMALLEST_CONTAINER_CAP, sizeof(DynArray)) == EXIT_FAILURE){
-        free_execution_resources_funge(origin_root, &stack_stack, &IPs);
-        return EXIT_FAILURE;
-    }
-    for(int i = 0; i < SMALLEST_CONTAINER_CAP; ++i){
-        DynArray tmp;
-        if(dyn_array_init(&tmp, DEFAULT_CONTAINER_CAP, sizeof(ptrdiff_t)) == EXIT_FAILURE){
-            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+    if(!(exec_flags & Funge98_Flag))
+    {
+        stack_b93_96_97 = (DynArray *)dyn_array_init(SMALLEST_CONTAINER_CAP, sizeof(DynArray));
+        DynArray *tmp = dyn_array_init(DEFAULT_CONTAINER_CAP, sizeof(ptrdiff_t));
+        if(!stack_b93_96_97 || !tmp){
+            fprintf(stderr, "Failure allocating memory\n");
+            free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
             return EXIT_FAILURE;
         }
-        if(dyn_array_push_back(&stack_stack, &tmp) == EXIT_FAILURE){
-            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+        
+        if(dyn_array_push_back(stack_b93_96_97, tmp) == EXIT_FAILURE){
+            dyn_array_free(tmp);
+            free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
             return EXIT_FAILURE;
         }
     }
 
-    if(dyn_array_init(&IPs, SMALLEST_CONTAINER_CAP, sizeof(FungeIP)) == EXIT_FAILURE){
-        free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+    IPs = (DynArray *)dyn_array_init(SMALLEST_CONTAINER_CAP, sizeof(FungeIP));
+    if(!IPs){
+        fprintf(stderr, "Failure allocating memory\n");
+        free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
         return EXIT_FAILURE;
     }
     {
+        FungeIP *tmp = NULL;
         char *tmp_pos_origin = (char *)calloc(exec_dimensions, sizeof(char));
-        if(!tmp_pos_origin){
-            fprintf(stderr, "Failure allocating memory\n");
-            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
-            return EXIT_FAILURE;
-        }
         ptrdiff_t *tmp_delta_origin = (ptrdiff_t *)calloc(exec_dimensions, sizeof(ptrdiff_t));
-        if(!tmp_delta_origin){
-            fprintf(stderr, "Failure allocating memory\n");
-            free(tmp_pos_origin);
-            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
-            return EXIT_FAILURE;
-        }
-        FungeIP *tmp = funge_ip_init(origin_root, tmp_pos_origin, tmp_delta_origin, &stack_stack, NULL, 0);
-        if(!tmp){
+        ptrdiff_t *tmp_storage_offset_origin = (ptrdiff_t *)calloc(exec_dimensions, sizeof(ptrdiff_t));
+        if(!tmp_pos_origin || !tmp_delta_origin || !tmp_storage_offset_origin){
             fprintf(stderr, "Failure allocating memory\n");
             free(tmp_pos_origin);
             free(tmp_delta_origin);
-            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+            free(tmp_storage_offset_origin);
+            free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
             return EXIT_FAILURE;
         }
-        if(dyn_array_push_back(&IPs, tmp) == EXIT_FAILURE){
-            fprintf(stderr, "Failure allocating memory\n");
-            free(tmp_pos_origin);
-            free(tmp_delta_origin);
-            free_execution_resources_funge(origin_root, &stack_stack, &IPs);
-            return EXIT_FAILURE;
+
+        if(exec_flags & Funge98_Flag){
+            DynArray *tmp_stack = dyn_array_init(DEFAULT_CONTAINER_CAP, sizeof(ptrdiff_t));
+            DynArray *tmp_stack_stack = dyn_array_init(SMALLEST_CONTAINER_CAP, sizeof(DynArray));
+            if(!tmp_stack || !tmp_stack_stack){
+                fprintf(stderr, "Failure allocating memory\n");
+                free(tmp_pos_origin);
+                free(tmp_delta_origin);
+                free(tmp_storage_offset_origin);
+                dyn_array_free(tmp_stack);
+                dyn_array_free(tmp_stack_stack);
+                free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
+                return EXIT_FAILURE;
+            }
+
+            if(dyn_array_push_back(tmp_stack_stack, tmp_stack) == EXIT_FAILURE){
+                free(tmp_pos_origin);
+                free(tmp_delta_origin);
+                free(tmp_storage_offset_origin);
+                dyn_array_free(tmp_stack);
+                dyn_array_free(tmp_stack_stack);
+                free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
+                return EXIT_FAILURE;
+            }
+
+            tmp = funge_ip_init(origin_root, tmp_pos_origin, tmp_delta_origin, tmp_storage_offset_origin, tmp_stack_stack, NULL, 0);
+            if(!tmp){
+                free(tmp_pos_origin);
+                free(tmp_delta_origin);
+                free(tmp_storage_offset_origin);
+                dyn_array_free(tmp_stack);
+                dyn_array_free(tmp_stack_stack);
+                free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
+                return EXIT_FAILURE;
+            }
+        }
+        else{
+            tmp = funge_ip_init(origin_root, tmp_pos_origin, tmp_delta_origin, tmp_storage_offset_origin, NULL, NULL, 0);
+            if(!tmp){
+                free(tmp_pos_origin);
+                free(tmp_delta_origin);
+                free(tmp_storage_offset_origin);
+                free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
+                return EXIT_FAILURE;
+            }
         }
     }
 
-    free_execution_resources_funge(origin_root, &stack_stack, &IPs);
+    ptrdiff_t c;
+    FungeIP curr_ip;
+    // Utility
+    size_t cell_coordinate;
+
+    while(true){
+        for(size_t i = 0; i < IPs->size; ++i){
+            if(dyn_array_get(IPs, i, &curr_ip) == EXIT_FAILURE){
+                free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
+                return EXIT_FAILURE;
+            }
+            if(exec_dimensions == 1)
+                cell_coordinate = curr_ip.position[0];
+            else cell_coordinate = curr_ip.position[1] * FUNGE_SPACE_LENGTH + curr_ip.position[0];
+
+            c = curr_ip.section->section[cell_coordinate];
+
+            // switch
+        }
+    }
+
+    free_execution_resources_funge(origin_root, stack_b93_96_97, IPs);
     return EXIT_SUCCESS;
 }
 
