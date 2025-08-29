@@ -17,6 +17,8 @@ Any other character is to be treated as a comment and ignored.
 
 The original implementation specified a tape consisting of 30,000 byte-length cells on which the commands operate. Each action is performed on the cell to which the memory pointer is pointing. Upon initialization, all cells are set to zero.
 
+The original 240-byte implementation can be seen [here](https://www.aminet.net/search?query=brainfuck).
+
 ### Brainfuck programs
 Here are a few Brainfuck programs, designed to demonstrate the esolang's main features.
 
@@ -70,3 +72,5 @@ Multiplication of two memory blocks:
 ```brainfuck
 ,>,<[->[->+>+<<]>[-<+>]<<]>>>.
 ```
+
+More brainfuck (a _ton_ of brainfuck) programs can be seen [here](https://www.brainfuck.org/).
