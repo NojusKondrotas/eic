@@ -168,3 +168,63 @@ int stack_swap_top(DynArray *stack){
         return EXIT_FAILURE;
     return dyn_array_push_back(stack, &second_pop);
 }
+
+int stack_invert_top(DynArray *stack, bool is_signed){
+    if(stack->size == 0){
+        fprintf(stderr, "Stack size cannot be 0 when inverting its top item\n");
+        return EXIT_FAILURE;
+    }
+    ptrdiff_t tmp_signed;
+    size_t tmp_unsigned;
+
+    if(is_signed){
+        if(dyn_array_pop_back(stack, &tmp_signed) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+
+        if(!tmp_signed) tmp_signed = 1;
+        else tmp_signed = 0;
+
+        return dyn_array_push_back(stack, &tmp_signed);
+    }
+    else{
+        if(dyn_array_pop_back(stack, &tmp_unsigned) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+
+        if(!tmp_unsigned) tmp_unsigned = 1;
+        else tmp_unsigned = 0;
+
+        return dyn_array_push_back(stack, &tmp_unsigned);
+    }
+}
+
+int stack_compare(DynArray *stack, bool is_signed){
+    if(stack->size < 2){
+        fprintf(stderr, "Stack size cannot be less than 2 when comparing its two top items\n");
+        return EXIT_FAILURE;
+    }
+    ptrdiff_t signed_left, signed_right;
+    size_t unsigned_left, unsigned_right;
+
+    if(is_signed){
+        if(dyn_array_pop_back(stack, &signed_right) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+        if(dyn_array_pop_back(stack, &signed_left) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+
+        if(signed_left > signed_right) signed_left = 1;
+        else signed_left = 0;
+
+        return dyn_array_push_back(stack, &signed_left);
+    }
+    else{
+        if(dyn_array_pop_back(stack, &unsigned_right) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+        if(dyn_array_pop_back(stack, &unsigned_left) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+
+        if(unsigned_left > unsigned_right) unsigned_left = 1;
+        else unsigned_left = 0;
+
+        return dyn_array_push_back(stack, &unsigned_left);
+    }
+}

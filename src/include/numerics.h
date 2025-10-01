@@ -29,4 +29,8 @@ int stack_duplicate_element(DynArray *stack, size_t index);
 
 int stack_swap_top(DynArray *stack);
 
+int stack_invert_top(DynArray *stack, bool is_signed);
+
+int stack_compare(DynArray *stack, bool is_signed);
+
 #endif
