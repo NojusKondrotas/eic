@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
                 return EXIT_FAILURE;
         }
         else{
-            if(*(extension = get_extension(argv[i])) == NULL){
+            if((extension = get_extension(argv[i])) == NULL){
                 fprintf(stderr, "File does not contain an extension: %s\n", argv[i]);
                 return EXIT_FAILURE;
             }
