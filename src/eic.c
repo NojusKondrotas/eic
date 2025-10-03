@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
                 return EXIT_FAILURE;
         }
         else{
-            if(*(extension = get_extension(argv[i])) == '\0'){
+            if(*(extension = get_extension(argv[i])) == NULL){
                 fprintf(stderr, "File does not contain an extension: %s\n", argv[i]);
                 return EXIT_FAILURE;
             }
@@ -294,14 +294,21 @@ int check_flag_conflict(EICFlags eic_flags, FungeFlags funge_exec_flags, int fun
 }
 
 char *get_extension(char *str){
-    char *extension = str;
+    int count = 0, length = 0;
     while(*str != '\0'){
-        if(*str != '.' || *(str + 1) == '\\' || *(str + 1) == '.' || *(str + 1) == '/')
-            extension = ++str;
-        else return ++extension;
+        ++count;
+        ++length;
+        ++str;
     }
 
-    return extension;
+    while(count-- > -1){
+        if(*str == '.')
+            return ++str;
+
+        --str;
+    }
+
+    return NULL;
 }
 
 size_t hash_string(char *str){
